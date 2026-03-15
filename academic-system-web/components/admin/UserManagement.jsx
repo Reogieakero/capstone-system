@@ -8,6 +8,7 @@ import {
 } from 'react-icons/io5';
 import { ADMIN_USER_FILTERS } from '../../constants/admin.constants';
 import LoadingState from '../ui/LoadingState';
+import FilterTabs from '../ui/FilterTabs';
 import { showErrorToast, showSuccessToast } from '../../utils/sileoNotify';
 import DeleteUserConfirmModal from './DeleteUserConfirmModal';
 import styles from './UserManagement.module.css';
@@ -75,18 +76,13 @@ export default function UserManagement({
   return (
     <section className={styles.usersSection}>
       <div className={styles.headerActionArea}>
-        <div className={styles.filterTabs}>
-          {ADMIN_USER_FILTERS.map((filterKey) => (
-            <button
-              key={filterKey}
-              className={`${styles.filterTab} ${userFilter === filterKey ? styles.filterTabActive : ''}`}
-              onClick={() => setUserFilter(filterKey)}
-            >
-              {filterKey.charAt(0).toUpperCase() + filterKey.slice(1)}
-              {filterKey !== 'all' && <span className={styles.filterCount}>{userStatusCounts[filterKey] || 0}</span>}
-            </button>
-          ))}
-        </div>
+        <FilterTabs
+          items={ADMIN_USER_FILTERS}
+          activeValue={userFilter}
+          onChange={setUserFilter}
+          renderLabel={(filterKey) => filterKey.charAt(0).toUpperCase() + filterKey.slice(1)}
+          getCount={(filterKey) => (filterKey === 'all' ? null : userStatusCounts[filterKey] || 0)}
+        />
       </div>
 
       {pageLoading ? (

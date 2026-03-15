@@ -25,7 +25,6 @@ export default function AdminSidebar({
     onToggle();
   };
 
-  // Group items by section (System vs Vault)
   const systemItems = ADMIN_NAV_ITEMS.filter(item => item.section === 'system');
   const vaultItems = ADMIN_NAV_ITEMS.filter(item => item.section === 'vault');
 

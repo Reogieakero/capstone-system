@@ -14,49 +14,6 @@
   align-items: center;
 }
 
-.filterTabs {
-  display: flex;
-  border: 1px solid #dde5d9;
-  border-radius: 8px;
-  background: #fff;
-  overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.filterTab {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border: none;
-  border-right: 1px solid #dde5d9;
-  background: none;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: #64748b;
-  cursor: pointer;
-}
-
-.filterTab:last-child {
-  border-right: none;
-}
-
-.filterTabActive {
-  background: #1e293b;
-  color: #fff;
-}
-
-.filterCount {
-  font-size: 0.65rem;
-  background: rgba(0, 0, 0, 0.1);
-  padding: 1px 6px;
-  border-radius: 10px;
-}
-
-.filterTabActive .filterCount {
-  background: rgba(255, 255, 255, 0.2);
-}
-
 .tableWrapper {
   background: #fff;
   border: 1px solid #e2e8f0;

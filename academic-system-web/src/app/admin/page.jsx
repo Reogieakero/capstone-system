@@ -1,6 +1,7 @@
 'use client';
 
 import AdminSidebar from '../../../components/admin/AdminSidebar';
+import Sf10Vault from '../../../components/admin/Sf10Vault';
 import AdminTopNav from '../../../components/admin/AdminTopNav';
 import SystemOverview from '../../../components/admin/SystemOverview';
 import UserManagement from '../../../components/admin/UserManagement';
@@ -72,6 +73,8 @@ export default function AdminPage() {
               userStatusCounts={userStatusCounts}
             />
           )}
+
+          {activePage === 'storage' && <Sf10Vault />}
         </main>
       </div>
     </div>
