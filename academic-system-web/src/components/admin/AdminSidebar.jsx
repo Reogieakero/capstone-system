@@ -3,15 +3,17 @@
 import { 
   LayoutGrid, 
   Users,
-  Folder // Changed from HardDrive to Folder
+  Folder,
+  Layers
 } from 'lucide-react';
-import { ADMIN_NAV_ITEMS } from '../../constants/admin.constants';
+import { ADMIN_NAV_ITEMS } from '../../../constants/admin.constants';
 import styles from './AdminSidebar.module.css';
 
 const navIcons = {
   overview: LayoutGrid,
   users: Users,
-  storage: Folder, // Updated mapping
+  sections: Layers,
+  storage: Folder, 
 };
 
 export default function AdminSidebar({

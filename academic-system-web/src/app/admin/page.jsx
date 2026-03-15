@@ -1,13 +1,15 @@
 'use client';
 
-import AdminSidebar from '../../../components/admin/AdminSidebar';
-import Sf10Vault from '../../../components/admin/Sf10Vault';
-import AdminTopNav from '../../../components/admin/AdminTopNav';
-import SystemOverview from '../../../components/admin/SystemOverview';
-import UserManagement from '../../../components/admin/UserManagement';
-import LoadingState from '../../../components/ui/LoadingState';
-import { SileoNotification } from '../../../components/ui/SileoNotification';
-import useAdminDashboard from '../../../hooks/useAdminDashboard';
+import AdminSidebar from '../../components/admin/AdminSidebar';
+import Sf10Vault from '../../components/admin/Sf10Vault';
+import AdminTopNav from '../../components/admin/AdminTopNav';
+import SystemOverview from '../../components/admin/SystemOverview';
+import UserManagement from '../../components/admin/UserManagement';
+import SectionManagement from '../../components/admin/SectionManagement'; 
+
+import LoadingState from '../../components/ui/LoadingState';
+import { SileoNotification } from '../../components/ui/SileoNotification';
+import useAdminDashboard from '../../hooks/useAdminDashboard';
 import styles from './admin.module.css';
 
 export default function AdminPage() {
@@ -50,7 +52,6 @@ export default function AdminPage() {
 
         <main className={styles.main}>
           <header className={styles.header}>
-
             <div className={styles.headerTitleBlock}>
               <h1 className={styles.pageTitle}>{pageTitle}</h1>
             </div>
@@ -72,6 +73,10 @@ export default function AdminPage() {
               userFilter={userFilter}
               userStatusCounts={userStatusCounts}
             />
+          )}
+
+          {activePage === 'sections' && (
+            <SectionManagement pageLoading={pageLoading} />
           )}
 
           {activePage === 'storage' && <Sf10Vault />}

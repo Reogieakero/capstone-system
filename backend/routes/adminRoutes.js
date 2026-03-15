@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { requireAdmin, getUsers, approveUser, getStats, deleteUser } = require('../controllers/adminController');
+const { requireAdmin, getUsers, approveUser, getStats, deleteUser } = require('../controllers/admin');
 
 router.use(requireAdmin);
 

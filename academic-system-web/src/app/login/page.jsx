@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { IoEyeOutline, IoEyeOffOutline } from 'react-icons/io5';
-import Button from '../../../components/ui/Button';
-import { SileoNotification } from '../../../components/ui/SileoNotification';
-import useLoginAuth from '../../../hooks/useLoginAuth';
-import { showLoginPromiseToast } from '../../../utils/sileoNotify';
+import Button from '../../components/ui/Button';
+import { SileoNotification } from '../../components/ui/SileoNotification';
+import useLoginAuth from '../../hooks/useLoginAuth';
+import { showLoginPromiseToast } from '../../utils/sileoNotify';
 import styles from './login.module.css';
 
 

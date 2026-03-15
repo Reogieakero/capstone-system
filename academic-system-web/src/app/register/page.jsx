@@ -1,15 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { SileoNotification } from '../../../components/ui/SileoNotification';
-import Modal from '../../../components/layout/Modal';
-import RegisterForm from '../../../components/register/RegisterForm';
-import RegisterSidebar from '../../../components/register/RegisterSidebar';
+import { SileoNotification } from '../../components/ui/SileoNotification';
+import Modal from '../../components/layout/Modal';
+import RegisterForm from '../../components/register/RegisterForm';
+import RegisterSidebar from '../../components/register/RegisterSidebar';
 import { INITIAL_REGISTER_FORM_DATA, SUFFIX_OPTIONS } from '../../../constants/register.constants';
-import useRegisterPasswordValidation from '../../../hooks/useRegisterPasswordValidation';
-import useRegisterAuth from '../../../hooks/useRegisterAuth';
-import { showRegisterPromiseToast, showVerifyPromiseToast } from '../../../utils/sileoNotify';
-import VerifyOtpModal from '../../../components/register/VerifyOtpModal';
+import useRegisterPasswordValidation from '../../hooks/useRegisterPasswordValidation';
+import useRegisterAuth from '../../hooks/useRegisterAuth';
+import { showRegisterPromiseToast, showVerifyPromiseToast } from '../../utils/sileoNotify';
+import VerifyOtpModal from '../../components/register/VerifyOtpModal';
 import styles from './register.module.css';
 
 export default function Register() {

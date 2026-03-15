@@ -4,7 +4,7 @@ import {
   showPasswordRequirementsToast,
   showPasswordSuccessToast,
 } from '../utils/sileoNotify';
-import { PASSWORD_RULES } from '../constants/register.constants';
+import { PASSWORD_RULES } from '../../constants/register.constants';
 
 export default function useRegisterPasswordValidation({ formData, styles }) {
   const passValidation = useMemo(() => {

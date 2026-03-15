@@ -9,8 +9,6 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
   );
 }
 
-// Server-side only client — bypasses Row Level Security.
-// Never expose this or the service role key to any client.
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
   auth: {
     autoRefreshToken: false,

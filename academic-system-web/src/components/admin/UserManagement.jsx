@@ -6,7 +6,7 @@ import {
   IoMailOutline, IoCalendarOutline, IoShieldCheckmarkOutline, 
   IoToggleOutline, IoGridOutline, IoTrashOutline 
 } from 'react-icons/io5';
-import { ADMIN_USER_FILTERS } from '../../constants/admin.constants';
+import { ADMIN_USER_FILTERS } from '../../../constants/admin.constants';
 import LoadingState from '../ui/LoadingState';
 import FilterTabs from '../ui/FilterTabs';
 import { showErrorToast, showSuccessToast } from '../../utils/sileoNotify';

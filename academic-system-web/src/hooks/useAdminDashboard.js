@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../utils/supabaseClient';
-import { ADMIN_PAGE_TITLES } from '../constants/admin.constants';
+import { ADMIN_PAGE_TITLES } from '../../constants/admin.constants';
 import { 
   showPromiseToast, 
   showSuccessToast, 
