@@ -218,10 +218,10 @@ export default function UserManagement({
                     <div className={styles.actionBtns}>
                       {user.status === 'pending' ? (
                         <>
-                          <button className={styles.rejectIconButton} onClick={() => onReject(user.id)}>
+                          <button className={styles.rejectIconButton} onClick={() => onReject(user.id, `${user.first_name} ${user.last_name}`)}>
                             <IoClose size={16} />
                           </button>
-                          <button className={styles.approveBtnInspo} onClick={() => onApprove(user.id)}>
+                          <button className={styles.approveBtnInspo} onClick={() => onApprove(user.id, `${user.first_name} ${user.last_name}`)}>
                             <IoCheckmark size={16} /> Approve
                           </button>
                         </>

@@ -4,6 +4,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../utils/supabaseClient';
 import { ADMIN_PAGE_TITLES } from '../constants/admin.constants';
+import { 
+  showPromiseToast, 
+  showSuccessToast, 
+  showErrorToast 
+} from '../utils/sileoNotify'; //
 
 export default function useAdminDashboard() {
   const router = useRouter();
@@ -97,28 +102,58 @@ export default function useAdminDashboard() {
   }, [activePage, fetchStats, fetchUsers, loading]);
 
   const handleApprove = useCallback(
-    async (userId) => {
+    async (userId, userName) => {
+      try {
       const token = await getToken();
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/approve-user`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/approve-user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ userId, action: 'approve' }),
       });
+
+      if (!res.ok) throw new Error('Failed to approve user');
+
+      showSuccessToast({
+        title: 'User Approved',
+        description: `${userName} now has access to the system.`,
+      });
+
       await Promise.all([fetchUsers(), fetchStats()]);
-    },
+    } catch (error) {
+      showErrorToast({
+        title: 'Approval Error',
+        description: error.message,
+      });
+    }
+  },
     [fetchStats, fetchUsers, getToken]
   );
 
   const handleReject = useCallback(
-    async (userId) => {
+    async (userId, userName) => {
+      try {
       const token = await getToken();
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/approve-user`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/approve-user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ userId, action: 'reject' }),
       });
+
+      if (!res.ok) throw new Error('Failed to reject user');
+
+      showWarningToast({
+        title: 'User Rejected',
+        description: `${userName}'s application has been moved to the rejected list.`,
+      });
+
       await Promise.all([fetchUsers(), fetchStats()]);
-    },
+    } catch (error) {
+      showErrorToast({
+        title: 'Rejection Error',
+        description: error.message,
+      });
+    }
+  },
     [fetchStats, fetchUsers, getToken]
   );
 
