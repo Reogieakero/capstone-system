@@ -1,0 +1,148 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+
+  --color-white: #ffffff;
+  --color-black: #111111;
+  --color-page-bg: #f5f7f2;
+  --color-surface-subtle: #f8f9fa;
+  --color-surface-soft: #f7faf5;
+  --color-surface-muted: #fafafa;
+
+  --color-border-soft: #e9e9e9;
+  --color-border-subtle: #e5e5e5;
+  --color-border-section: #e6ebe2;
+  --color-border-nav: #dde5d9;
+  --color-border-quiet: #d9e2d5;
+  --color-border-muted: #d6dfd2;
+  --color-border-spinner: #e2e2e2;
+
+  --color-text-strong: #1f2e24;
+  --color-text-primary: #223127;
+  --color-text-body: #333333;
+  --color-text-muted: #666666;
+  --color-text-subtle: #7d8d80;
+  --color-text-quiet: #a8b5aa;
+  --color-text-disabled: #999999;
+  --color-text-heading: #2b362d;
+  --color-text-sidebar-hover: #607164;
+  --color-text-avatar-alt: #526052;
+  --color-text-sidebar-strong: #334034;
+  --color-text-ghost: #5f6c61;
+  --color-text-logout: #4f5f50;
+  --color-text-empty: #cccccc;
+
+  --color-brand-green: #2ac07d;
+  --color-brand-green-dark: #1f9b64;
+  --color-brand-green-strong: #1f8f5f;
+  --color-brand-green-soft: #dff2e8;
+  --color-brand-green-hover: #eef4eb;
+
+  --color-indigo-50: #eef0ff;
+  --color-indigo-100: #dde0ff;
+  --color-indigo-500: #6366f1;
+
+  --color-amber-50: #fef9ec;
+  --color-amber-100: #fde68a;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+  --color-amber-500: #b66600;
+  --color-amber-200: #f6c37a;
+  --color-amber-25: #fff4e5;
+
+  --color-emerald-50: #edfaf4;
+  --color-emerald-100: #a7f3d0;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+
+  --color-rose-50: #fff1f2;
+  --color-rose-100: #fecdd3;
+  --color-rose-200: #fee2e2;
+  --color-rose-700: #be123c;
+  --color-rose-25: #fef4f4;
+  --color-rose-150: #f2c5c5;
+  --color-danger-700: #b54343;
+
+  --color-avatar-grad-start: #e4e9df;
+  --color-avatar-grad-end: #cdd7ca;
+  --color-avatar-text: #4f5e50;
+
+  --color-shadow-brand-rgb: 42 192 125;
+  --color-shadow-focus-rgb: 42 192 125;
+  --color-overlay-black-07: rgba(0, 0, 0, 0.07);
+  --color-overlay-brand-05: rgba(31, 143, 95, 0.05);
+  --color-overlay-white-72: rgba(255, 255, 255, 0.72);
+  --color-overlay-white-64: rgba(255, 255, 255, 0.64);
+  --color-overlay-sidebar-border: rgba(228, 233, 223, 0.9);
+  --color-overlay-white-18: rgba(255, 255, 255, 0.18);
+
+  --color-neutral-900-soft: #222222;
+  --color-border-table-head: #ebebeb;
+  --color-border-table-row: #f3f3f3;
+  --color-emerald-200: #d1fae5;
+}
+
+html {
+  scrollbar-gutter: auto;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-kulim-park), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-title {
+  font-family: var(--font-unbounded), Arial, Helvetica, sans-serif;
+}
+
+p,
+span,
+small,
+label,
+input,
+textarea,
+button,
+li,
+a,
+.font-description {
+  font-family: var(--font-kulim-park), Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}

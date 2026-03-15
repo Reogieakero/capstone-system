@@ -1,0 +1,279 @@
+.wrapper {
+  display: flex;
+  height: 100dvh;
+  font-family: var(--font-kulim-park);
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.sidebar {
+  flex: 1.2 1 0;
+  background-color: #1a16cf;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 80px 60px;
+  position: relative;
+  min-height: 0;
+}
+
+.mainIcon {
+  font-size: 80px;
+  font-weight: 300;
+  margin-bottom: 40px;
+}
+
+.welcomeText h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  letter-spacing: -0.04em;
+}
+
+.welcomeText p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 460px;
+  opacity: 0.9;
+}
+
+.sidebarFooter {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.formContainer {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 60px;
+  overflow: hidden;
+}
+
+.formContent {
+  width: 100%;
+  max-width: 400px;
+  max-height: 100%;
+}
+
+.brandName {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.formTitles h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.formTitles p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 18px;
+}
+
+.formTitles a {
+  color: #000;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.registerForm {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nameGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.selectGridItem {
+  margin-bottom: 15px;
+}
+
+.fieldGroup {
+  position: relative;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.fieldGroup input,
+.inputWrapper input {
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 1rem;
+  background: transparent;
+  outline: none;
+  color: #000;
+}
+
+.morphLine {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+  transform: scaleX(0);
+  transform-origin: left; 
+  transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+  pointer-events: none;
+}
+
+.fieldGroup input:focus ~ .morphLine,
+.inputWrapper input:focus ~ .morphLine {
+  transform: scaleX(1);
+}
+
+.iconButton {
+  position: absolute;
+  right: 0;
+  bottom: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.agreementWrapper {
+  margin: 6px 0 14px 0;
+}
+
+.checkboxContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.checkboxContainer input {
+  display: none;
+}
+
+.checkmark {
+  min-width: 18px;
+  height: 18px;
+  border: 2px solid #e5e7eb;
+  border-radius: 4px;
+  position: relative;
+  margin-top: 2px;
+}
+
+.checkboxContainer input:checked ~ .checkmark {
+  background-color: #000;
+  border-color: #000;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkboxContainer input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkboxContainer p {
+  font-size: 0.8rem;
+  color: #666;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.link {
+  color: #000;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.toastTitle {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.toastDescription {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.toastList {
+  margin: 0;
+  padding-left: 18px;
+  list-style: disc;
+  display: grid;
+  gap: 6px;
+}
+
+.toastList li {
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.toastRuleMet {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.toastRuleMet::marker {
+  color: #22c55e;
+}
+
+.toastRulePending {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.toastRulePending::marker {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.toastRuleMismatch {
+  color: #fbbf24;
+  font-weight: 700;
+}
+
+.toastRuleMismatch::marker {
+  color: #fbbf24;
+}
+
+@media (max-width: 1024px) {
+  .wrapper { height: auto; min-height: 100dvh; flex-direction: column; overflow: auto; }
+  .sidebar { padding: 40px; flex: none; }
+  .formContainer { padding: 40px 20px; }
+}
+
+@media (max-width: 600px) {
+  .nameGrid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

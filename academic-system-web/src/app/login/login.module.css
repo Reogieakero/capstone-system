@@ -1,0 +1,192 @@
+.wrapper {
+  display: flex;
+  min-height: 100vh;
+  font-family: var(--font-kulim-park);
+  background-color: #ffffff;
+}
+
+.sidebar {
+  flex: 1.2 1 0;
+  background-color: #1a16cf;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 80px 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.mainIcon {
+  font-size: 80px;
+  font-weight: 300;
+  margin-bottom: 60px;
+  z-index: 1;
+}
+
+.welcomeText {
+  z-index: 1;
+}
+
+.welcomeText h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  letter-spacing: -0.04em;
+}
+
+.wave {
+  display: inline-block;
+  margin-left: 10px;
+  transform: rotate(-15deg);
+}
+
+.welcomeText p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 460px;
+  opacity: 0.9;
+  text-wrap: balance;
+}
+
+.sidebarFooter {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  z-index: 1;
+}
+
+.formContainer {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+}
+
+.formContent {
+  width: 100%;
+  max-width: 400px;
+}
+
+.brandName {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 60px;
+  color: #000;
+}
+
+.formTitles h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.formTitles p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+
+.formTitles a {
+  color: #000;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.fieldGroup {
+  position: relative;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.fieldGroup input {
+  width: 100%;
+  padding: 12px 0;
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 1rem;
+  background: transparent;
+  outline: none;
+  color: #000;
+}
+
+.morphLine {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+  transform: scaleX(0);
+  transform-origin: left; 
+  transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.fieldGroup input:focus ~ .morphLine,
+.inputWrapper input:focus ~ .morphLine {
+  transform: scaleX(1);
+}
+
+.iconButton {
+  position: absolute;
+  right: 0;
+  bottom: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  transition: color 0.2s;
+  z-index: 3;
+}
+
+.iconButton:hover {
+  color: #000;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formFooter {
+  margin-top: 32px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.formFooter a {
+  color: #000;
+  font-weight: 600;
+  text-decoration: underline;
+  margin-left: 5px;
+}
+
+@media (max-width: 1024px) {
+  .wrapper {
+    flex-direction: column;
+  }
+  .sidebar {
+    padding: 60px 40px;
+    flex: none;
+  }
+  .formContainer {
+    padding: 40px 20px;
+  }
+}

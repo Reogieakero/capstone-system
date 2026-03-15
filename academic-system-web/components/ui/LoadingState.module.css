@@ -1,0 +1,172 @@
+.fullScreen {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-subtle);
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader {
+  --loader-scale: 1;
+  --square: 26px;
+  --offset: 30px;
+  --duration: 2.4s;
+  --delay: 0.2s;
+  --timing: ease-in-out;
+  --in-duration: 0.4s;
+  --in-delay: 0.1s;
+  --in-timing: ease-out;
+  position: relative;
+  width: calc(3 * var(--offset) + var(--square));
+  height: calc(2 * var(--offset) + var(--square));
+  transform: scale(var(--loader-scale));
+  transform-origin: center;
+}
+
+.sm {
+  --loader-scale: 0.72;
+}
+
+.md {
+  --loader-scale: 1;
+}
+
+.lg {
+  --loader-scale: 1.22;
+}
+
+.loaderSquare {
+  position: absolute;
+  width: var(--square);
+  height: var(--square);
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--color-brand-green-dark) 45%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-brand-green) 85%, var(--color-white) 15%) 0%,
+    var(--color-brand-green-dark) 100%
+  );
+  box-shadow: 0 6px 14px rgb(var(--color-shadow-brand-rgb) / 0.18);
+}
+
+.square1 {
+  left: calc(0 * var(--offset));
+  top: calc(0 * var(--offset));
+  animation:
+    square-1 var(--duration) var(--delay) var(--timing) infinite,
+    square-fade-in var(--in-duration) calc(1 * var(--in-delay)) var(--in-timing) both;
+}
+
+.square2 {
+  left: calc(0 * var(--offset));
+  top: calc(1 * var(--offset));
+  animation:
+    square-2 var(--duration) var(--delay) var(--timing) infinite,
+    square-fade-in var(--in-duration) calc(1 * var(--in-delay)) var(--in-timing) both;
+}
+
+.square3 {
+  left: calc(1 * var(--offset));
+  top: calc(1 * var(--offset));
+  animation:
+    square-3 var(--duration) var(--delay) var(--timing) infinite,
+    square-fade-in var(--in-duration) calc(2 * var(--in-delay)) var(--in-timing) both;
+}
+
+.square4 {
+  left: calc(2 * var(--offset));
+  top: calc(1 * var(--offset));
+  animation:
+    square-4 var(--duration) var(--delay) var(--timing) infinite,
+    square-fade-in var(--in-duration) calc(3 * var(--in-delay)) var(--in-timing) both;
+}
+
+.square5 {
+  left: calc(3 * var(--offset));
+  top: calc(1 * var(--offset));
+  animation:
+    square-5 var(--duration) var(--delay) var(--timing) infinite,
+    square-fade-in var(--in-duration) calc(4 * var(--in-delay)) var(--in-timing) both;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes square-1 {
+  0% { left: calc(0 * var(--offset)); top: calc(0 * var(--offset)); }
+  8.333% { left: calc(0 * var(--offset)); top: calc(1 * var(--offset)); }
+  100% { left: calc(0 * var(--offset)); top: calc(1 * var(--offset)); }
+}
+
+@keyframes square-2 {
+  0% { left: calc(0 * var(--offset)); top: calc(1 * var(--offset)); }
+  8.333% { left: calc(0 * var(--offset)); top: calc(2 * var(--offset)); }
+  16.67% { left: calc(1 * var(--offset)); top: calc(2 * var(--offset)); }
+  25% { left: calc(1 * var(--offset)); top: calc(1 * var(--offset)); }
+  83.33% { left: calc(1 * var(--offset)); top: calc(1 * var(--offset)); }
+  91.67% { left: calc(1 * var(--offset)); top: calc(0 * var(--offset)); }
+  100% { left: calc(0 * var(--offset)); top: calc(0 * var(--offset)); }
+}
+
+@keyframes square-3 {
+  0%, 100% { left: calc(1 * var(--offset)); top: calc(1 * var(--offset)); }
+  16.67% { left: calc(1 * var(--offset)); top: calc(1 * var(--offset)); }
+  25% { left: calc(1 * var(--offset)); top: calc(0 * var(--offset)); }
+  33.33% { left: calc(2 * var(--offset)); top: calc(0 * var(--offset)); }
+  41.67% { left: calc(2 * var(--offset)); top: calc(1 * var(--offset)); }
+  66.67% { left: calc(2 * var(--offset)); top: calc(1 * var(--offset)); }
+  75% { left: calc(2 * var(--offset)); top: calc(2 * var(--offset)); }
+  83.33% { left: calc(1 * var(--offset)); top: calc(2 * var(--offset)); }
+  91.67% { left: calc(1 * var(--offset)); top: calc(1 * var(--offset)); }
+}
+
+@keyframes square-4 {
+  0% { left: calc(2 * var(--offset)); top: calc(1 * var(--offset)); }
+  33.33% { left: calc(2 * var(--offset)); top: calc(1 * var(--offset)); }
+  41.67% { left: calc(2 * var(--offset)); top: calc(2 * var(--offset)); }
+  50% { left: calc(3 * var(--offset)); top: calc(2 * var(--offset)); }
+  58.33% { left: calc(3 * var(--offset)); top: calc(1 * var(--offset)); }
+  100% { left: calc(3 * var(--offset)); top: calc(1 * var(--offset)); }
+}
+
+@keyframes square-5 {
+  0% { left: calc(3 * var(--offset)); top: calc(1 * var(--offset)); }
+  50% { left: calc(3 * var(--offset)); top: calc(1 * var(--offset)); }
+  58.33% { left: calc(3 * var(--offset)); top: calc(0 * var(--offset)); }
+  66.67% { left: calc(2 * var(--offset)); top: calc(0 * var(--offset)); }
+  75% { left: calc(2 * var(--offset)); top: calc(1 * var(--offset)); }
+  100% { left: calc(2 * var(--offset)); top: calc(1 * var(--offset)); }
+}
+
+@keyframes square-fade-in {
+  0% {
+    transform: scale(0.75);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loaderSquare {
+    animation: none;
+  }
+}

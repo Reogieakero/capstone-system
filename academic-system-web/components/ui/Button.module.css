@@ -1,0 +1,96 @@
+.btn {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  width: 100%;
+  padding: 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.contentWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  position: relative;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.btn:hover .overlay {
+  opacity: 1;
+}
+
+.primary {
+  background-color: #000;
+  color: #fff;
+}
+
+.primary .overlay {
+  background: radial-gradient(
+    800px circle at var(--mouse-x) var(--mouse-y),
+    rgba(255, 255, 255, 0.15),
+    transparent 40%
+  );
+}
+
+.primary:hover {
+  background-color: #111;
+  border-color: #333;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.secondary {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #e5e7eb;
+}
+
+.secondary .overlay {
+  background: radial-gradient(
+    600px circle at var(--mouse-x) var(--mouse-y),
+    rgba(0, 0, 0, 0.05),
+    transparent 40%
+  );
+}
+
+.secondary:hover {
+  border-color: #d1d5db;
+  background-color: #fafafa;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.disabled {
+  opacity: 0.4;
+  cursor: not-allowed !important;
+  background-color: #999 !important;
+}
+
+.disabled .overlay {
+  display: none;
+}

@@ -1,0 +1,121 @@
+.fieldGroup {
+  position: relative;
+  width: 100%;
+  margin-bottom: 15px;
+  z-index: 2;
+}
+
+.selectField {
+  width: 100%;
+  text-align: left;
+  padding: 10px 28px 10px 0;
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.valueLabel {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.emptyValue {
+  color: #666;
+}
+
+.hasValue {
+  color: #000;
+}
+
+.indicator {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  width: 10px;
+  height: 10px;
+  border-right: 1.8px solid #9ca3af;
+  border-bottom: 1.8px solid #9ca3af;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.open .indicator {
+  transform: translateY(-22%) rotate(225deg);
+  border-color: #000;
+}
+
+.morphLine {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+  pointer-events: none;
+}
+
+.selectField:focus ~ .indicator,
+.fieldGroup:hover .indicator {
+  border-color: #000;
+}
+
+.selectField:focus ~ .morphLine,
+.open .morphLine {
+  transform: scaleX(1);
+}
+
+.optionsPanel {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: 100%;
+  padding: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
+  display: grid;
+  gap: 4px;
+  z-index: 10;
+}
+
+.optionItem {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  color: #111827;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.optionItem:hover,
+.optionItem:focus-visible {
+  background-color: #f3f4f6;
+  color: #000;
+  outline: none;
+}
+
+.selectedOption {
+  background-color: #111827;
+  color: #fff;
+}
+
+.selectField:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
