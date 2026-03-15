@@ -1,0 +1,65 @@
+.userSummary {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  text-align: left;
+  background: #f8fafc;
+  margin-bottom: 14px;
+}
+
+.userSummary p {
+  margin: 0 0 6px;
+  color: #334155;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.userSummary p:last-child {
+  margin-bottom: 0;
+}
+
+.userId {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: #0f172a;
+  word-break: break-all;
+}
+
+.confirmationBox {
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.82rem;
+  color: #334155;
+  font-weight: 600;
+}
+
+.input {
+  width: 100%;
+  border: 1.5px solid #dbe4ee;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.86rem;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus {
+  border-color: #be123c;
+  box-shadow: 0 0 0 3px rgba(190, 18, 60, 0.14);
+}
+
+.mismatchText {
+  margin: 7px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.77rem;
+  color: #be123c;
+}

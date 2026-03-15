@@ -122,6 +122,29 @@ export default function useAdminDashboard() {
     [fetchStats, fetchUsers, getToken]
   );
 
+  const handleDeleteUser = useCallback(
+    async (userId, confirmationUserId) => {
+      const token = await getToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/delete-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userId, confirmationUserId }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || 'Failed to delete user.');
+      }
+
+      await Promise.all([fetchUsers(), fetchStats()]);
+      return data;
+    },
+    [fetchUsers, fetchStats, getToken]
+  );
+
   const handleSignOut = useCallback(async () => {
     await supabase.auth.signOut();
     router.replace('/login');
@@ -145,6 +168,7 @@ export default function useAdminDashboard() {
     filteredUsers,
     handleApprove,
     handleReject,
+    handleDeleteUser,
     handleSignOut,
     loading,
     pageLoading,

@@ -1,5 +1,7 @@
 'use client';
 
+import { useMemo, useState } from 'react';
+
 import { 
   IoCheckmark, 
   IoClose, 
@@ -9,22 +11,75 @@ import {
   IoCalendarOutline,
   IoShieldCheckmarkOutline, 
   IoToggleOutline, 
-  IoGridOutline 
+  IoGridOutline,
+  IoTrashOutline
 } from 'react-icons/io5';
 import { ADMIN_USER_FILTERS } from '../../constants/admin.constants';
 import LoadingState from '../ui/LoadingState';
 import { showErrorToast, showSuccessToast } from '../../utils/sileoNotify';
+import DeleteUserConfirmModal from './DeleteUserConfirmModal';
 import styles from './UserManagement.module.css';
 
 export default function UserManagement({
   filteredUsers,
   onApprove,
   onReject,
+  handleDeleteUser,
+  currentUserRole,
   pageLoading,
   setUserFilter,
   userFilter,
   userStatusCounts,
 }) {
+  const [deleteTargetUser, setDeleteTargetUser] = useState(null);
+  const [confirmUserId, setConfirmUserId] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const requiresPrincipalConfirmation = useMemo(
+    () => currentUserRole === 'principal',
+    [currentUserRole]
+  );
+
+  const closeDeleteModal = () => {
+    if (isDeleting) return;
+    setDeleteTargetUser(null);
+    setConfirmUserId('');
+  };
+
+  const openDeleteModal = (user) => {
+    setDeleteTargetUser(user);
+    setConfirmUserId('');
+  };
+
+  const onConfirmDelete = async () => {
+    if (!deleteTargetUser) return;
+
+    if (requiresPrincipalConfirmation && confirmUserId.trim() !== deleteTargetUser.id) {
+      showErrorToast({
+        title: 'Verification mismatch',
+        description: 'Principal confirmation requires the exact target user ID.',
+      });
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await handleDeleteUser(deleteTargetUser.id, confirmUserId.trim());
+      showSuccessToast({
+        title: 'User removed',
+        description: 'The account has been deleted successfully.',
+      });
+      closeDeleteModal();
+    } catch (error) {
+      showErrorToast({
+        title: 'Delete failed',
+        description: error?.message || 'Failed to remove user account.',
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const formatCreatedAt = (value) => {
     if (!value) {
       return '—';
@@ -173,6 +228,17 @@ export default function UserManagement({
                       ) : (
                         <span className={styles.statusPlaceholder}>—</span>
                       )}
+                      {!['admin', 'principal'].includes(user.role) ? (
+                        <button 
+                          className={styles.deleteBtn} 
+                          onClick={() => openDeleteModal(user)}
+                          title="Delete User"
+                        >
+                          <IoTrashOutline size={16} />
+                        </button>
+                      ) : (
+                        user.status !== 'pending' && <span className={styles.protectedLabel}>Protected</span>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -181,6 +247,17 @@ export default function UserManagement({
           </table>
         </div>
       )}
+
+      <DeleteUserConfirmModal
+        isOpen={Boolean(deleteTargetUser)}
+        user={deleteTargetUser}
+        actorRole={currentUserRole}
+        confirmUserId={confirmUserId}
+        onConfirmUserIdChange={setConfirmUserId}
+        onCancel={closeDeleteModal}
+        onConfirm={onConfirmDelete}
+        submitting={isDeleting}
+      />
     </section>
   );
 }

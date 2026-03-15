@@ -15,6 +15,7 @@ export default function AdminPage() {
     collapsed,
     filteredUsers,
     handleApprove,
+    handleDeleteUser,
     handleReject,
     handleSignOut,
     loading,
@@ -60,9 +61,11 @@ export default function AdminPage() {
 
           {activePage === 'users' && (
             <UserManagement
+              currentUserRole={profile?.role}
               filteredUsers={filteredUsers}
               onApprove={handleApprove}
               onReject={handleReject}
+              handleDeleteUser={handleDeleteUser}
               pageLoading={pageLoading}
               setUserFilter={setUserFilter}
               userFilter={userFilter}
