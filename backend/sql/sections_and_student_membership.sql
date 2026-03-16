@@ -1,0 +1,1 @@
+Error: Failed to run sql query: ERROR: 42P17: generation expression is not immutable

@@ -18,6 +18,7 @@ export default function AdminPage() {
     collapsed,
     filteredUsers,
     handleApprove,
+    handleCreateSection,
     handleDeleteUser,
     handleReject,
     handleSignOut,
@@ -79,6 +80,7 @@ export default function AdminPage() {
           {activePage === 'sections' && (
             <SectionManagement
               pageLoading={pageLoading}
+              onCreateSection={handleCreateSection}
               users={users}
             />
           )}

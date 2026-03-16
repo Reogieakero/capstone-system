@@ -198,6 +198,28 @@ export default function useAdminDashboard() {
     [fetchUsers, fetchStats, getToken]
   );
 
+  const handleCreateSection = useCallback(
+    async (sectionPayload) => {
+      const token = await getToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/sections`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(sectionPayload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || 'Failed to create section.');
+      }
+
+      return data.section;
+    },
+    [getToken]
+  );
+
   const handleSignOut = useCallback(async () => {
     await supabase.auth.signOut();
     router.replace('/login');
@@ -222,6 +244,7 @@ export default function useAdminDashboard() {
     handleApprove,
     handleReject,
     handleDeleteUser,
+    handleCreateSection,
     handleSignOut,
     loading,
     pageLoading,
