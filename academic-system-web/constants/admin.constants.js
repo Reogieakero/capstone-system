@@ -7,8 +7,8 @@ export const ADMIN_NAV_ITEMS = [
 
 export const ADMIN_PAGE_TITLES = {
   overview: 'System Overview',
-  users: 'User Management',
-  sections: 'Section Management',
+  users: 'Users ',
+  sections: 'Sections ',
   storage: 'SF10 Repository',
 };
 

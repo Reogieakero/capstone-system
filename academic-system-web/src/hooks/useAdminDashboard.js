@@ -10,10 +10,23 @@ import {
   showErrorToast 
 } from '../utils/sileoNotify'; //
 
+const ADMIN_ACTIVE_PAGE_KEY = 'admin_active_page';
+
+function getInitialAdminPage() {
+  if (typeof window === 'undefined') return 'overview';
+
+  const savedPage = window.sessionStorage.getItem(ADMIN_ACTIVE_PAGE_KEY);
+  if (!savedPage) return 'overview';
+
+  return Object.prototype.hasOwnProperty.call(ADMIN_PAGE_TITLES, savedPage)
+    ? savedPage
+    : 'overview';
+}
+
 export default function useAdminDashboard() {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
-  const [activePage, setActivePage] = useState('overview');
+  const [activePage, setActivePage] = useState(getInitialAdminPage);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
@@ -100,6 +113,11 @@ export default function useAdminDashboard() {
       fetchUsers();
     }
   }, [activePage, fetchStats, fetchUsers, loading]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.sessionStorage.setItem(ADMIN_ACTIVE_PAGE_KEY, activePage);
+  }, [activePage]);
 
   const handleApprove = useCallback(
     async (userId, userName) => {
