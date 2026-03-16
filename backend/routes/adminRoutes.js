@@ -3,6 +3,7 @@ const router = express.Router();
 const {
 	requireAdmin,
 	getUsers,
+	getSections,
 	approveUser,
 	getStats,
 	createSection,
@@ -16,6 +17,8 @@ router.get('/users', getUsers);
 router.post('/approve-user', approveUser);
 
 router.get('/stats', getStats);
+
+router.get('/sections', getSections);
 
 router.post('/sections', createSection);
 

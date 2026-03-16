@@ -31,6 +31,7 @@ export default function useAdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
+  const [sections, setSections] = useState([]);
   const [pageLoading, setPageLoading] = useState(false);
   const [userFilter, setUserFilter] = useState('all');
 
@@ -65,6 +66,22 @@ export default function useAdminDashboard() {
       const data = await res.json();
       if (res.ok) {
         setUsers(data.users || []);
+      }
+    } finally {
+      setPageLoading(false);
+    }
+  }, [getToken]);
+
+  const fetchSections = useCallback(async () => {
+    setPageLoading(true);
+    try {
+      const token = await getToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/sections`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSections(data.sections || []);
       }
     } finally {
       setPageLoading(false);
@@ -109,10 +126,15 @@ export default function useAdminDashboard() {
       fetchStats();
     }
 
-    if (activePage === 'users' || activePage === 'sections') {
+    if (activePage === 'users') {
       fetchUsers();
     }
-  }, [activePage, fetchStats, fetchUsers, loading]);
+
+    if (activePage === 'sections') {
+      fetchUsers();
+      fetchSections();
+    }
+  }, [activePage, fetchSections, fetchStats, fetchUsers, loading]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -215,9 +237,10 @@ export default function useAdminDashboard() {
         throw new Error(data?.error || 'Failed to create section.');
       }
 
-      return data.section;
+      await fetchSections();
+      return data;
     },
-    [getToken]
+    [fetchSections, getToken]
   );
 
   const handleSignOut = useCallback(async () => {
@@ -251,6 +274,7 @@ export default function useAdminDashboard() {
     pageTitle: ADMIN_PAGE_TITLES[activePage],
     profile,
     users,
+    sections,
     setActivePage,
     setCollapsed,
     setUserFilter,

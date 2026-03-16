@@ -26,6 +26,7 @@ export default function AdminPage() {
     pageLoading,
     pageTitle,
     profile,
+    sections,
     users,
     setActivePage,
     setCollapsed,
@@ -81,6 +82,7 @@ export default function AdminPage() {
             <SectionManagement
               pageLoading={pageLoading}
               onCreateSection={handleCreateSection}
+              sections={sections}
               users={users}
             />
           )}
