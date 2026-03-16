@@ -1,0 +1,149 @@
+.logContainer {
+  background: var(--color-white);
+  border: 1px solid var(--color-border-section);
+  border-radius: 16px;
+  padding: 20px;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
+
+.titleGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerIcon {
+  color: var(--color-brand-green);
+  font-size: 1.2rem;
+}
+
+.title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-strong);
+  margin: 0;
+}
+
+.viewAll {
+  background: none;
+  border: none;
+  color: var(--color-brand-green);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.viewAll:hover {
+  opacity: 0.7;
+}
+
+.logList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-top: 4px;
+  scrollbar-width: none;
+}
+
+.logList::-webkit-scrollbar {
+  display: none;
+}
+
+
+.logItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border-section);
+}
+
+.logItem:last-child {
+  border-bottom: none;
+}
+
+.logItem:hover .actionName {
+  color: var(--color-brand-green);
+}
+
+.iconWrapper {
+  width: 30px;
+  height: 30px;
+  background: var(--color-white);
+  color: var(--color-text-subtle);
+  border-radius: 8px;
+  border: 1px solid var(--color-border-section);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.logMain {
+  display: flex;
+  flex-direction: column;
+}
+
+.actionName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-strong);
+}
+
+.detailText {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.logMeta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: var(--color-text-subtle);
+  margin-top: 2px;
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.success { background: var(--color-brand-green); }
+.info    { background: #3b82f6; }
+.error   { background: #ef4444; }
+
+.success { background: var(--color-brand-green); }
+.info    { background: #3b82f6; }
+.error   { background: #ef4444; }
+
+.success { background: var(--color-brand-green); }
+.info { background: #3b82f6; }
+.error { background: #ef4444; }

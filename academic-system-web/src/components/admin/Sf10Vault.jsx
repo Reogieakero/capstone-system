@@ -2,7 +2,10 @@
 
 import { useState } from 'react';
 import FilterTabs from '../ui/FilterTabs';
+import ActivityLog from './ActivityLog';
 import ImportSf10Card from './ImportSf10Card';
+import Sf10FolderGrid from './Sf10FolderGrid';
+
 import styles from './Sf10Vault.module.css';
 
 const GRADE_FILTERS = ['all', '7', '8', '9', '10', '11', '12'];
@@ -25,11 +28,15 @@ export default function Sf10Vault() {
         />
       </div>
 
-      <div className={styles.topActionRow}>
-        <ImportSf10Card onImport={handleImportFile} />
-      </div>
+      <div className={styles.bodyRow}>
+        <div className={styles.contentArea}>
+          <Sf10FolderGrid activeGrade={activeGrade} />
+        </div>
 
-      <div className={styles.content}>
+        <div className={styles.sidePanel}>
+          <ImportSf10Card onImport={handleImportFile} />
+          <ActivityLog />
+        </div>
       </div>
     </section>
   );
