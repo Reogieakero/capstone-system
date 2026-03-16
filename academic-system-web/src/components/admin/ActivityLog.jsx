@@ -19,7 +19,6 @@ export default function ActivityLog() {
     <div className={styles.logContainer}>
       <div className={styles.header}>
         <div className={styles.titleGroup}>
-          <IoSyncOutline className={styles.headerIcon} />
           <h3 className={styles.title}>Activity Logs</h3>
         </div>
         <button className={styles.viewAll}>View All</button>

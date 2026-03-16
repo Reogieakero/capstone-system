@@ -1,17 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import { IoListOutline } from 'react-icons/io5';
 import FilterTabs from '../ui/FilterTabs';
 import ActivityLog from './ActivityLog';
 import ImportSf10Card from './ImportSf10Card';
 import Sf10FolderGrid from './Sf10FolderGrid';
-
+import VaultNotes from './VaultNotes';
 import styles from './Sf10Vault.module.css';
 
 const GRADE_FILTERS = ['all', '7', '8', '9', '10', '11', '12'];
 
 export default function Sf10Vault() {
   const [activeGrade, setActiveGrade] = useState('all');
+  const [isNotesOpen, setIsNotesOpen] = useState(false);
 
   const handleImportFile = (file) => {
     console.log("Processing:", file.name);
@@ -26,6 +28,12 @@ export default function Sf10Vault() {
           onChange={setActiveGrade}
           renderLabel={(grade) => (grade === 'all' ? 'All Grades' : `Grade ${grade}`)}
         />
+        <button 
+          className={styles.todoBtn} 
+          onClick={() => setIsNotesOpen(true)}
+        >
+          <IoListOutline size={22} />
+        </button>
       </div>
 
       <div className={styles.bodyRow}>
@@ -38,6 +46,11 @@ export default function Sf10Vault() {
           <ActivityLog />
         </div>
       </div>
+
+      <VaultNotes 
+        isOpen={isNotesOpen} 
+        onClose={() => setIsNotesOpen(false)} 
+      />
     </section>
   );
 }
