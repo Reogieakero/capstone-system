@@ -1,0 +1,174 @@
+.bentoCard {
+  background: var(--color-white);
+  border: 1px solid var(--color-border-section);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 320px;
+  position: relative;
+  overflow: visible; 
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+  margin-right: -22px; 
+}
+
+.bentoCard:hover:not(.dragging) {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-brand-green);
+}
+
+.dragging {
+  border: 2px dashed var(--color-brand-green);
+  background: var(--color-brand-green-soft);
+  transform: scale(1.02);
+}
+
+.topContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+}
+
+.leftGroup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.iconContainer {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  background: var(--color-brand-green-soft);
+  color: var(--color-brand-green-strong);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-strong);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.description {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.tooltipContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  z-index: 10;
+}
+
+.helpIcon {
+  color: var(--color-text-subtle);
+  transition: color 0.2s ease;
+}
+
+.helpIcon:hover {
+  color: var(--color-brand-green);
+}
+
+.tooltipText {
+  visibility: hidden;
+  opacity: 0;
+  width: 160px;
+  background-color: var(--color-white);
+  color: var(--color-text-strong);
+  border: 1px solid var(--color-border-subtle);
+  text-align: center;
+  border-radius: 8px;
+  padding: 8px;
+  position: absolute;
+  bottom: 50%;
+  right: 130%; 
+  transform: translateY(50%);
+  transition: opacity 0.2s ease, visibility 0.2s;
+  font-size: 0.7rem;
+  font-weight: 600;
+  pointer-events: none; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
+}
+
+.tooltipText::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent transparent var(--color-border-subtle);
+}
+
+.tooltipText::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  margin-top: -4px;
+  margin-left: -1px;
+  border-width: 4px;
+  border-style: solid;
+  border-color: transparent transparent transparent var(--color-white);
+  z-index: 1;
+}
+
+.tooltipContainer:hover .tooltipText {
+  visibility: visible;
+  opacity: 1;
+}
+
+.importBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--color-brand-green);
+  color: var(--color-white);
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(var(--color-shadow-brand-rgb), 0.2);
+}
+
+.importBtn:hover {
+  background: var(--color-brand-green-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(var(--color-shadow-brand-rgb), 0.3);
+}
+
+.importBtn:active {
+  transform: translateY(0);
+}
+
+.hiddenInput {
+  display: none;
+}
