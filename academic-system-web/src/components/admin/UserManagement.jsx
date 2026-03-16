@@ -4,8 +4,9 @@ import { useMemo, useState } from 'react';
 import { 
   IoCheckmark, IoClose, IoPersonAdd, IoCopyOutline,
   IoMailOutline, IoCalendarOutline, IoShieldCheckmarkOutline, 
-  IoToggleOutline, IoGridOutline, IoTrashOutline 
+  IoToggleOutline, IoGridOutline, IoTrashOutline
 } from 'react-icons/io5';
+import { RefreshCw } from 'lucide-react';
 import { ADMIN_USER_FILTERS } from '../../../constants/admin.constants';
 import LoadingState from '../ui/LoadingState';
 import FilterTabs from '../ui/FilterTabs';
@@ -27,11 +28,13 @@ function buildDisplayName(user = {}) {
 
 export default function UserManagement({
   filteredUsers, onApprove, onReject, handleDeleteUser,
-  currentUserRole, pageLoading, setUserFilter, userFilter, userStatusCounts,
+  currentUserRole, onRefresh, pageLoading, setUserFilter, userFilter, userStatusCounts,
 }) {
   const [deleteTargetUser, setDeleteTargetUser] = useState(null);
   const [confirmUserId, setConfirmUserId] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const requiresPrincipalConfirmation = useMemo(() => currentUserRole === 'principal', [currentUserRole]);
 
@@ -85,16 +88,46 @@ export default function UserManagement({
     }
   };
 
+  const handleRefresh = async () => {
+    if (!onRefresh || isRefreshing) {
+      return;
+    }
+
+    setIsRefreshing(true);
+    try {
+      await onRefresh();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <section className={styles.usersSection}>
       <div className={styles.headerActionArea}>
-        <FilterTabs
-          items={ADMIN_USER_FILTERS}
-          activeValue={userFilter}
-          onChange={setUserFilter}
-          renderLabel={(filterKey) => filterKey.charAt(0).toUpperCase() + filterKey.slice(1)}
-          getCount={(filterKey) => (filterKey === 'all' ? null : userStatusCounts[filterKey] || 0)}
-        />
+        <div className={styles.actionControls}>
+          <FilterTabs
+            items={ADMIN_USER_FILTERS}
+            activeValue={userFilter}
+            onChange={setUserFilter}
+            renderLabel={(filterKey) => filterKey.charAt(0).toUpperCase() + filterKey.slice(1)}
+            getCount={(filterKey) => (filterKey === 'all' ? null : userStatusCounts[filterKey] || 0)}
+          />
+
+          <button
+            type="button"
+            className={styles.refreshBtn}
+            onClick={handleRefresh}
+            disabled={pageLoading || isRefreshing}
+            aria-label="Refresh users"
+            title="Refresh users"
+          >
+            <RefreshCw
+              size={15}
+              strokeWidth={2.3}
+              className={isRefreshing ? styles.refreshIconSpinning : ''}
+            />
+          </button>
+        </div>
       </div>
 
       {pageLoading ? (

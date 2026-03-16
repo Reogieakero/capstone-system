@@ -4,16 +4,25 @@ import React, { useState, useMemo } from 'react';
 import { ChevronDown, RefreshCw, UserRound } from 'lucide-react'; 
 import FloatingNotificationCard from '../ui/FloatingNotificationCard';
 import InsertSectionModal from './InsertSectionModal';
+import LoadingState from '../ui/LoadingState';
 import styles from './SectionManagement.module.css'; 
 
-export default function SectionManagement({ users = [], sections = [], onCreateSection }) {
+export default function SectionManagement({ users = [], sections = [], onCreateSection, onRefresh, pageLoading }) {
   const [showAdviserCard, setShowAdviserCard] = useState(false);
   const [showInsertModal, setShowInsertModal] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
+    if (!onRefresh || isRefreshing) {
+      return;
+    }
+
     setIsRefreshing(true);
-    window.setTimeout(() => { window.location.reload(); }, 150);
+    try {
+      await onRefresh();
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   const adviserData = useMemo(() => {
@@ -56,19 +65,21 @@ export default function SectionManagement({ users = [], sections = [], onCreateS
           <button 
             className={styles.refreshBtn} 
             onClick={handleRefresh} 
-            disabled={isRefreshing}
+            disabled={isRefreshing || pageLoading}
           >
             <RefreshCw 
               size={15} 
               strokeWidth={2.3} 
-              className={isRefreshing ? styles.spinning : ''} 
+              className={isRefreshing ? styles.refreshIconSpinning : ''} 
             />
           </button>
         </div>
       </div>
 
       <div className={styles.contentCard}>
-        {sections.length === 0 ? (
+        {pageLoading || isRefreshing ? (
+          <LoadingState size="md" label="Refreshing sections" />
+        ) : sections.length === 0 ? (
           <p className={styles.emptyText}>No sections created yet.</p>
         ) : (
           <p className={styles.emptyText}>{sections.length} Sections Active</p>

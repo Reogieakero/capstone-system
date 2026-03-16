@@ -26,6 +26,8 @@ export default function AdminPage() {
     pageLoading,
     pageTitle,
     profile,
+    refreshSectionsPage,
+    refreshUsersPage,
     sections,
     users,
     setActivePage,
@@ -71,6 +73,7 @@ export default function AdminPage() {
               onApprove={handleApprove}
               onReject={handleReject}
               handleDeleteUser={handleDeleteUser}
+              onRefresh={refreshUsersPage}
               pageLoading={pageLoading}
               setUserFilter={setUserFilter}
               userFilter={userFilter}
@@ -82,6 +85,7 @@ export default function AdminPage() {
             <SectionManagement
               pageLoading={pageLoading}
               onCreateSection={handleCreateSection}
+              onRefresh={refreshSectionsPage}
               sections={sections}
               users={users}
             />

@@ -243,6 +243,14 @@ export default function useAdminDashboard() {
     [fetchSections, getToken]
   );
 
+  const refreshUsersPage = useCallback(async () => {
+    await fetchUsers();
+  }, [fetchUsers]);
+
+  const refreshSectionsPage = useCallback(async () => {
+    await Promise.all([fetchUsers(), fetchSections()]);
+  }, [fetchSections, fetchUsers]);
+
   const handleSignOut = useCallback(async () => {
     await supabase.auth.signOut();
     router.replace('/login');
@@ -269,6 +277,8 @@ export default function useAdminDashboard() {
     handleDeleteUser,
     handleCreateSection,
     handleSignOut,
+    refreshSectionsPage,
+    refreshUsersPage,
     loading,
     pageLoading,
     pageTitle: ADMIN_PAGE_TITLES[activePage],
