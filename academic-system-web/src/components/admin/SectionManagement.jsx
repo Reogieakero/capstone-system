@@ -3,16 +3,22 @@
 import React, { useState } from 'react';
 import { ChevronDown, RefreshCw, UserRound } from 'lucide-react'; 
 import styles from './SectionManagement.module.css'; 
+import InsertSectionModal from './InsertSectionModal';
 
-export default function SectionManagement() {
+export default function SectionManagement({ users = [] }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showInsertModal, setShowInsertModal] = useState(false);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
+    window.setTimeout(() => { window.location.reload(); }, 120);
+  };
 
-    window.setTimeout(() => {
-      window.location.reload();
-    }, 120);
+  const initiateInsert = () => setShowInsertModal(true);
+
+  const handleActualInsert = (data) => {
+    console.log("New Section Data:", data);
+    setShowInsertModal(false);
   };
 
   return (
@@ -24,7 +30,7 @@ export default function SectionManagement() {
             <span>Advisor</span>
           </button>
 
-          <button type="button" className={styles.insertBtn}>
+          <button type="button" className={styles.insertBtn} onClick={initiateInsert}>
             <ChevronDown size={16} strokeWidth={2.5} />
             <span>Insert</span>
           </button>
@@ -34,15 +40,9 @@ export default function SectionManagement() {
             className={styles.refreshBtn}
             onClick={handleRefresh}
             disabled={isRefreshing}
-            aria-busy={isRefreshing}
-            aria-label="Refresh section page"
             title="Refresh"
           >
-            <RefreshCw
-              size={15}
-              strokeWidth={2.3}
-              className={isRefreshing ? styles.refreshIconSpinning : ''}
-            />
+            <RefreshCw size={15} strokeWidth={2.3} className={isRefreshing ? styles.refreshIconSpinning : ''} />
           </button>
         </div>
       </div>
@@ -50,6 +50,13 @@ export default function SectionManagement() {
       <div className={styles.contentCard}>
         <p className={styles.emptyText}>No sections created yet.</p>
       </div>
+
+      <InsertSectionModal 
+        isOpen={showInsertModal} 
+        onClose={() => setShowInsertModal(false)}
+        onConfirm={handleActualInsert}
+        teachers={users.filter((user) => user.role === 'teacher')}
+      />
     </div>
-  );
+  );  
 }

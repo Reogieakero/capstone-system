@@ -109,7 +109,7 @@ export default function useAdminDashboard() {
       fetchStats();
     }
 
-    if (activePage === 'users') {
+    if (activePage === 'users' || activePage === 'sections') {
       fetchUsers();
     }
   }, [activePage, fetchStats, fetchUsers, loading]);
@@ -227,6 +227,7 @@ export default function useAdminDashboard() {
     pageLoading,
     pageTitle: ADMIN_PAGE_TITLES[activePage],
     profile,
+    users,
     setActivePage,
     setCollapsed,
     setUserFilter,

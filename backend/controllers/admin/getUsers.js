@@ -15,7 +15,7 @@ async function getUsers(req, res) {
 
   const { data: users, error } = await supabaseAdmin
     .from('profiles')
-    .select('id, email, first_name, last_name, role, status, created_at')
+    .select('id, email, first_name, middle_name, last_name, role, status, created_at')
     .in('id', verifiedAuthUserIds)
     .order('created_at', { ascending: false });
 

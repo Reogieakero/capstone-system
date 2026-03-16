@@ -13,6 +13,18 @@ import { showErrorToast, showSuccessToast } from '../../utils/sileoNotify';
 import DeleteUserConfirmModal from './DeleteUserConfirmModal';
 import styles from './UserManagement.module.css';
 
+function buildDisplayName(user = {}) {
+  return [
+    user.first_name,
+    user.middle_name || user.middleName || user.middle || user.middlename,
+    user.last_name,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export default function UserManagement({
   filteredUsers, onApprove, onReject, handleDeleteUser,
   currentUserRole, pageLoading, setUserFilter, userFilter, userStatusCounts,
@@ -36,7 +48,7 @@ export default function UserManagement({
 
   const onConfirmDelete = async () => {
     if (!deleteTargetUser) return;
-    const fullName = `${deleteTargetUser.first_name} ${deleteTargetUser.last_name}`;
+    const fullName = buildDisplayName(deleteTargetUser);
 
     if (requiresPrincipalConfirmation && confirmUserId.trim() !== deleteTargetUser.id) {
       showErrorToast({ title: 'Verification mismatch', description: 'Enter the exact target user ID.' });
@@ -116,7 +128,7 @@ export default function UserManagement({
                   <td>
                     <div className={styles.nameCell}>
                       <div className={styles.avatarPlaceholder}>{user.first_name?.charAt(0) || 'U'}</div>
-                      <span>{`${user.first_name} ${user.last_name}`}</span>
+                      <span>{buildDisplayName(user)}</span>
                     </div>
                   </td>
                   <td className={styles.emailCell}>{user.email}</td>
@@ -132,8 +144,8 @@ export default function UserManagement({
                     <div className={styles.actionBtns}>
                       {user.status === 'pending' && (
                         <>
-                          <button className={styles.rejectIconButton} onClick={() => onReject(user.id, `${user.first_name} ${user.last_name}`)}><IoClose size={16} /></button>
-                          <button className={styles.approveBtnInspo} onClick={() => onApprove(user.id, `${user.first_name} ${user.last_name}`)}><IoCheckmark size={16} /> Approve</button>
+                          <button className={styles.rejectIconButton} onClick={() => onReject(user.id, buildDisplayName(user))}><IoClose size={16} /></button>
+                          <button className={styles.approveBtnInspo} onClick={() => onApprove(user.id, buildDisplayName(user))}><IoCheckmark size={16} /> Approve</button>
                         </>
                       )}
                       {!['admin', 'principal'].includes(user.role) ? (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react'; // Added useState for feedback
+import { useState } from 'react';
 import { 
   IoTrashOutline, 
   IoWarningOutline, 
@@ -20,7 +20,17 @@ export default function DeleteUserConfirmModal({
   onConfirm,
   submitting,
 }) {
-  const [copied, setCopied] = useState(false); // Track copy state
+  const [copied, setCopied] = useState(false);
+
+  const fullName = [
+    user?.first_name,
+    user?.middle_name || user?.middleName || user?.middle || user?.middlename,
+    user?.last_name,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
   if (!isOpen || !user) return null;
 
@@ -28,12 +38,11 @@ export default function DeleteUserConfirmModal({
   const userIdMatches = confirmUserId.trim() === user.id;
   const canConfirm = submitting ? false : (requiresPrincipalConfirmation ? userIdMatches : true);
 
-  // Copy handler
   const handleCopyId = async () => {
     try {
       await navigator.clipboard.writeText(user.id);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy: ', err);
     }
@@ -53,7 +62,7 @@ export default function DeleteUserConfirmModal({
       confirmLoading={submitting}
     >
       <div className={styles.userSummary}>
-        <p><strong>Name:</strong> {`${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Unknown user'}</p>
+        <p><strong>Name:</strong> {fullName || 'Unknown user'}</p>
         <p><strong>Email:</strong> {user.email || 'No email available'}</p>
         
         {/* Updated User ID Section with Copy Button */}

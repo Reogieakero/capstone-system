@@ -1,0 +1,211 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 20px;
+}
+
+.modal {
+  background: #fff;
+  width: 100%;
+  max-width: 460px;
+  border-radius: 8px;
+  padding: 32px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.titleIcon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #0f172a;
+}
+
+.titleIcon h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.subtitle {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  position: relative;
+  z-index: 10;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+
+.inputGroup label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.inputGroup input {
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline-color: #2d5a57;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.cancelBtn, .submitBtn {
+  height: 40px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.cancelBtn { background: #f1f5f9; color: #475569; }
+.submitBtn { background: #2d5a57; color: white; }
+
+.selectInput {
+  margin-bottom: 0;
+}
+
+.confirmSection {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px dashed #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.confirmHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.confirmHeader label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.copyBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.confirmInput {
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: monospace;
+}
+
+.helperText {
+  margin: 0;
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.helperText span {
+  font-family: monospace;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Update submitBtn to show it's disabled */
+.submitBtn:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+@media (max-width: 560px) {
+  .fieldGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.fieldGrid > .inputGroup:first-child {
+  position: relative;
+  z-index: 11;
+}
+
+.form > .inputGroup:nth-child(2) {
+  position: relative;
+  z-index: 5;
+}
+
+.selectInput :global(.options-container) { 
+  z-index: 9999 !important;
+}
+
+.selectInput :global(.placeholder), 
+.selectInput [class*="placeholder"] {
+  color: #94a3b8 !important; 
+  font-family: inherit;
+  font-size: 0.9rem;
+  opacity: 1;
+}
+
+.inputGroup input::placeholder {
+  color: #94a3b8;
+  font-family: inherit;
+  font-size: 0.9rem;
+}

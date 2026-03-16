@@ -25,6 +25,7 @@ export default function AdminPage() {
     pageLoading,
     pageTitle,
     profile,
+    users,
     setActivePage,
     setCollapsed,
     setUserFilter,
@@ -76,7 +77,10 @@ export default function AdminPage() {
           )}
 
           {activePage === 'sections' && (
-            <SectionManagement pageLoading={pageLoading} />
+            <SectionManagement
+              pageLoading={pageLoading}
+              users={users}
+            />
           )}
 
           {activePage === 'storage' && <Sf10Vault />}
