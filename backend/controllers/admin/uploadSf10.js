@@ -179,11 +179,6 @@ function toSheetRows(workbook) {
   return rows;
 }
 
-/**
- * Extract plain text from DrawingML / SpreadsheetML XML fragments.
- * Catches text inside <a:t>, <t>, <v> and similar tags — this is where
- * text-box / shape content lives in an .xlsx archive.
- */
 function extractTextFromXml(content) {
   const xmlStr = Buffer.isBuffer(content)
     ? content.toString('utf8')
@@ -204,13 +199,6 @@ function extractTextFromXml(content) {
   return texts;
 }
 
-/**
- * Collect supplemental text from:
- *  1. workbook.Strings  – the shared-strings table (all text that cells ever
- *     reference, whether or not our per-cell pass caught it)
- *  2. workbook.files    – raw zip entries (populated when xlsx is read with
- *     bookFiles: true) — specifically xl/drawings/*.xml which hold text boxes
- */
 function extractAdditionalWorkbookTexts(workbook) {
   const texts = [];
 
@@ -228,7 +216,6 @@ function extractAdditionalWorkbookTexts(workbook) {
         const extracted = extractTextFromXml(rawFiles[filename]);
         texts.push(...extracted);
       } catch (_) {
-        /* ignore malformed XML */
       }
     }
   });
@@ -559,22 +546,14 @@ function sanitizeFileName(fileName) {
   return String(fileName || 'sf10.xlsx').replace(/[^a-zA-Z0-9._-]/g, '_');
 }
 
-/**
- * Sanitize learner folder name: removes comma and replaces spaces with single underscores
- * "Mabawad, Reogie Akero P" → "Mabawad_Reogie_Akero_P"
- */
+
 function sanitizeLearnerName(name) {
   return String(name || '')
-    .replace(/,/g, '') // Remove commas
-    .replace(/\s+/g, '_') // Replace spaces with single underscore
+    .replace(/,/g, '') 
+    .replace(/\s+/g, '_') 
     .trim();
 }
 
-/**
- * Extract learner info from SF10 spreadsheet rows
- * Searches for rows containing "LAST NAME:", "FIRST NAME:", "MIDDLE NAME:" labels
- * Returns format: "LastName, FirstName MiddleInitial"
- */
 function extractLearnerInfo(rows) {
   let lastName = '';
   let firstName = '';
@@ -587,11 +566,9 @@ function extractLearnerInfo(rows) {
 
     const rowText = row.join('|').toLowerCase();
 
-    // Search for LAST NAME label and capture the value
     if (rowText.includes('last name') && !lastName) {
       const labelIndex = row.findIndex((cell) => String(cell || '').toLowerCase().includes('last name'));
       if (labelIndex !== -1) {
-        // Look for the first non-empty cell after label
         for (let i = labelIndex + 1; i < row.length; i += 1) {
           const cell = String(row[i] || '').trim();
           if (cell && !cell.match(/^\s*:?\s*$/)) {
@@ -602,11 +579,9 @@ function extractLearnerInfo(rows) {
       }
     }
 
-    // Search for FIRST NAME label and capture the value
     if (rowText.includes('first name') && !firstName) {
       const labelIndex = row.findIndex((cell) => String(cell || '').toLowerCase().includes('first name'));
       if (labelIndex !== -1) {
-        // Look for the first non-empty cell after label
         for (let i = labelIndex + 1; i < row.length; i += 1) {
           const cell = String(row[i] || '').trim();
           if (cell && !cell.match(/^\s*:?\s*$/)) {
@@ -617,11 +592,9 @@ function extractLearnerInfo(rows) {
       }
     }
 
-    // Search for MIDDLE NAME label and capture the value
     if (rowText.includes('middle name') && !middleName) {
       const labelIndex = row.findIndex((cell) => String(cell || '').toLowerCase().includes('middle name'));
       if (labelIndex !== -1) {
-        // Look for the first non-empty cell after label
         for (let i = labelIndex + 1; i < row.length; i += 1) {
           const cell = String(row[i] || '').trim();
           if (cell && !cell.match(/^\s*:?\s*$/)) {
@@ -637,7 +610,6 @@ function extractLearnerInfo(rows) {
     return null;
   }
 
-  // Extract first letter of middle name as initial
   const middleInitial = middleName ? middleName.charAt(0).toUpperCase() : '';
   const learnerFolder = middleInitial 
     ? `${lastName}, ${firstName} ${middleInitial}`
@@ -671,20 +643,12 @@ function detectSectionFromKnownSections(corpus, sections) {
   return bestMatch?.section || null;
 }
 
-/**
- * SF10-JHS template: grade level is typed into I22, section name into N22.
- * Read those cells directly before falling back to fuzzy parsing.
- * Also probe immediate neighbours (±1 col, ±1 row) to tolerate minor
- * template variations.
- */
+
 function detectFromKnownCells(workbook) {
   let detectedGrade = null;
   let detectedSectionName = null;
 
-  // Cell addresses to probe, in priority order.
-  // I22 = grade level input, N22 = section name input (SF10-JHS template).
-  // Neighbours are probed because the cells may be part of a merged region whose
-  // origin cell (which actually holds the value) could be slightly offset.
+  
   const gradeCandidates = ['I22', 'J22', 'H22', 'I21', 'I23', 'K22', 'G22'];
   const sectionCandidates = ['N22', 'O22', 'M22', 'N21', 'N23', 'P22', 'L22'];
 
@@ -694,7 +658,6 @@ function detectFromKnownCells(workbook) {
 
     const merges = Array.isArray(sheet['!merges']) ? sheet['!merges'] : [];
 
-    // Log all raw cell values around the known cells to help diagnose address mismatches
     const diagLog = {};
     ['H21','I21','J21','K21','H22','I22','J22','K22','H23','I23','J23','K23',
      'L21','M21','N21','O21','P21','L22','M22','N22','O22','P22','L23','M23','N23','O23','P23',
@@ -710,7 +673,6 @@ function detectFromKnownCells(workbook) {
     if (!detectedGrade) {
       for (const addr of gradeCandidates) {
         const decoded = XLSX.utils.decode_cell(addr);
-        // getDisplayTextFromGrid checks the cell directly AND the merge origin
         const text = getDisplayTextFromGrid(sheet, merges, decoded.r, decoded.c);
         const normalized = String(text).trim();
         const gradeMatch = normalized.match(/^(7|8|9|10|11|12)$/) ||
@@ -775,21 +737,15 @@ async function uploadSf10(req, res) {
   try {
     const workbook = XLSX.read(file.buffer, {
       type: 'buffer',
-      // bookFiles exposes raw zip entries so we can read drawing XML (text boxes)
       bookFiles: true,
-      // cellHTML populates cell.h — HTML representation — as an extra signal
       cellHTML: true,
     });
 
-    // OCR-like scan: parse all sheet cells and inspect text patterns for grade + section.
     const sheetMetadata = buildSheetMetadata(workbook);
     const cellStrings = toCellStrings(workbook);
     const cellEntries = toCellEntries(workbook);
     const rows = toSheetRows(workbook);
 
-    // Supplement with text from drawing objects (text boxes) and shared strings.
-    // Some SF10 templates store the Grade / Section header in a DrawingML text box
-    // rather than in a standard cell, so cell-by-cell parsing alone misses them.
     const additionalTexts = extractAdditionalWorkbookTexts(workbook);
     const allTextCorpus = Array.from(new Set([...cellStrings, ...additionalTexts]));
     const workbookCorpus = buildWorkbookCorpus(allTextCorpus);
@@ -805,7 +761,6 @@ async function uploadSf10(req, res) {
       sampleRows: rows.slice(0, 12),
     });
 
-    // Primary: read the exact cells the template uses for grade and section.
     const knownCellDetection = detectFromKnownCells(workbook);
     const adjacentDetection = detectFromAdjacentCells(rows);
     const layoutDetection = detectFromCellLayout(cellEntries);
@@ -921,8 +876,6 @@ async function uploadSf10(req, res) {
         : null,
     });
 
-    // Single-section fallback: if exactly one section exists in the DB, auto-route when
-    // detection is incomplete. This covers templates where grade/section cells are blank.
     if ((!detectedGrade || !detectedSectionName) && (allSections || []).length === 1) {
       const fallback = allSections[0];
       detectedGrade = detectedGrade || String(fallback.grade_level);
@@ -1002,7 +955,6 @@ async function uploadSf10(req, res) {
       });
     }
 
-  // Extract learner info from SF10 to create learner-specific folder
   const learnerFolder = extractLearnerInfo(rows);
   logSf10Debug('learner_extraction', {
     learnerFolder,
@@ -1011,7 +963,6 @@ async function uploadSf10(req, res) {
 
   const sanitizedSection = sanitizeFileName(matchedSection.section_name || matchedSection.name || 'section');
   
-  // Include learner folder in path if extracted, otherwise use timestamp-based path
   const storagePath = learnerFolder
     ? `grade_${detectedGrade}/${sanitizedSection}/${sanitizeLearnerName(learnerFolder)}/${Date.now()}_${sanitizeFileName(file.originalname)}`
     : `grade_${detectedGrade}/${sanitizedSection}/${Date.now()}_${sanitizeFileName(file.originalname)}`;

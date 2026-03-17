@@ -1,54 +1,27 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import { IoDocumentTextOutline } from 'react-icons/io5';
+import useSf10FolderContents from '../../hooks/useSf10FolderContents';
+import LoadingState from '../ui/LoadingState';
 import styles from './Sf10FolderContents.module.css';
 
-function formatDate(dateStr) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
 export default function Sf10FolderContents({ folder, onBack, onGetFiles, onGetSignedUrl }) {
-  const [files, setFiles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [openingPath, setOpeningPath] = useState(null);
-  const [error, setError] = useState(null);
-
-  const loadFiles = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await onGetFiles(folder.id);
-      setFiles(result?.files || []);
-    } catch (err) {
-      setError(err?.message || 'Failed to load files.');
-      setFiles([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [folder.id, onGetFiles]);
-
-  useEffect(() => {
-    loadFiles();
-  }, [loadFiles]);
-
-  const handleViewFile = async (filePath) => {
-    setOpeningPath(filePath);
-    try {
-      const { signedUrl } = await onGetSignedUrl(filePath);
-      window.open(signedUrl, '_blank', 'noopener,noreferrer');
-    } catch (_) {
-    } finally {
-      setOpeningPath(null);
-    }
-  };
+  const {
+    error,
+    files,
+    formatDate,
+    handleViewFile,
+    loading,
+    openingPath,
+  } = useSf10FolderContents({
+    folderId: folder?.id,
+    onGetFiles,
+    onGetSignedUrl,
+  });
 
   return (
     <div className={styles.container}>
-      {loading && <div className={styles.emptyState}>Loading files...</div>}
+      {loading && <LoadingState size="md" label="Loading files" />}
 
       {!loading && error && <div className={styles.emptyState}>{error}</div>}
 

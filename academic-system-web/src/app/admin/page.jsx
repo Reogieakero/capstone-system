@@ -123,6 +123,7 @@ export default function AdminPage() {
               onGetFiles={handleGetSf10Files}
               onGetSignedUrl={handleGetSf10SignedUrl}
               onFolderSelect={setSf10Folder}
+              selectedFolderExternal={sf10Folder}
               pageLoading={pageLoading}
               sections={sections}
             />
