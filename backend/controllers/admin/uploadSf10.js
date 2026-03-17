@@ -235,8 +235,6 @@ function detectGradeLevel(cellStrings) {
   return null;
 }
 
-// Short section-name capture: 1-3 words starting with a letter, stops before
-// recognisable SF10 label words (School Year, School ID, Adviser, District …)
 const SECTION_VALUE_RE =
   /([a-zA-Z][a-zA-Z0-9\-'\u00C0-\u024F]{0,30}(?:\s+[a-zA-Z][a-zA-Z0-9\-'\u00C0-\u024F]{0,30}){0,2})/;
 
@@ -962,7 +960,30 @@ async function uploadSf10(req, res) {
   });
 
   const sanitizedSection = sanitizeFileName(matchedSection.section_name || matchedSection.name || 'section');
-  
+
+  // Duplicate check: if learner folder is known, verify no file already exists for this student
+  if (learnerFolder) {
+    const learnerStoragePath = `grade_${detectedGrade}/${sanitizedSection}/${sanitizeLearnerName(learnerFolder)}`;
+    const { data: existingFiles, error: checkError } = await supabaseAdmin.storage
+      .from(SF10_STORAGE_BUCKET)
+      .list(learnerStoragePath, { limit: 1 });
+
+    if (!checkError && existingFiles && existingFiles.filter((f) => f.name && f.name !== '.emptyFolderPlaceholder').length > 0) {
+      logSf10Debug('duplicate_detected', {
+        learnerFolder,
+        learnerStoragePath,
+        existingCount: existingFiles.length,
+      });
+      return res.status(409).json({
+        error: `An SF10 file for ${learnerFolder} (Grade ${detectedGrade} – ${detectedSectionName}) already exists. Please delete the existing file before uploading a new one.`,
+        code: 'SF10_DUPLICATE_FILE',
+        learner: learnerFolder,
+        grade: detectedGrade,
+        section: detectedSectionName,
+      });
+    }
+  }
+
   const storagePath = learnerFolder
     ? `grade_${detectedGrade}/${sanitizedSection}/${sanitizeLearnerName(learnerFolder)}/${Date.now()}_${sanitizeFileName(file.originalname)}`
     : `grade_${detectedGrade}/${sanitizedSection}/${Date.now()}_${sanitizeFileName(file.originalname)}`;

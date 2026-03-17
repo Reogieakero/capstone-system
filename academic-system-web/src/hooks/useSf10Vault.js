@@ -66,6 +66,10 @@ export default function useSf10Vault({ onImportSf10, onFolderSelect, selectedFol
         return;
       }
 
+      if (error?.status === 409 && error?.code === 'SF10_DUPLICATE_FILE') {
+        return;
+      }
+
       showErrorToast({
         title: 'Upload failed',
         description: error?.message || 'Unable to upload SF10 file.',

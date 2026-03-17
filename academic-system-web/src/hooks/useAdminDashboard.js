@@ -284,6 +284,13 @@ export default function useAdminDashboard() {
             return { title: 'Auto-detect failed. Choose a folder.' };
           }
 
+          if (err?.status === 409 && err?.code === 'SF10_DUPLICATE_FILE') {
+            return {
+              title: 'File already exists',
+              description: err?.message || 'An SF10 file for this student already exists in this section.',
+            };
+          }
+
           return { title: err?.message || 'SF10 upload failed.' };
         },
       });
