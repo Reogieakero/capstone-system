@@ -22,6 +22,9 @@
   z-index: 1001;
   display: flex;
   flex-direction: column;
+}
+
+.slideIn {
   animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
@@ -133,13 +136,3 @@
 
 .deleteIcon { cursor: pointer; }
 .deleteIcon:hover { color: #fa5252; }
-
-.fadeOut {
-  animation: fadeOut 0.3s ease-in forwards;
-  pointer-events: none;   /* ← ADD THIS LINE */
-}
-
-.slideOut {
-  animation: slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  pointer-events: none;   /* ← ADD THIS LINE */
-}

@@ -15,6 +15,68 @@
   align-items: center;
 }
 
+.analyticsHeaderArea {
+  left: 0;
+  top: -78px;
+  background: var(--color-page-bg);
+  display: flex;
+  align-items: flex-start;
+  padding-bottom: 2px;
+}
+
+.analyticsHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.analyticsBackBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--color-text-subtle);
+  transition: color 0.15s ease;
+}
+
+.analyticsBackBtn:hover {
+  color: var(--color-brand-green);
+}
+
+.analyticsHeaderLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.analyticsTitle {
+  margin: 0;
+  font-size: 1.38rem;
+  font-weight: 700;
+  color: var(--color-text-strong);
+  letter-spacing: -0.02em;
+  font-family: var(--font-unbounded);
+  line-height: 1;
+}
+
+.analyticsAdviser {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--color-text-subtle);
+  font-weight: 400;
+}
+
+.analyticsAdviser span {
+  color: var(--color-brand-green);
+  font-weight: 500;
+}
+
 .actionButtons {
   display: flex;
   align-items: center;
@@ -84,15 +146,16 @@
   color: #1e293b;
 }
 
-.contentCard {
+.contentArea {
+  width: 100%;
+}
+
+.emptyText {
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 60px;
   text-align: center;
-}
-
-.emptyText {
   color: #64748b;
   font-size: 0.9rem;
 }

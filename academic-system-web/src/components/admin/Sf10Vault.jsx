@@ -7,16 +7,30 @@ import ActivityLog from './ActivityLog';
 import ImportSf10Card from './ImportSf10Card';
 import Sf10FolderGrid from './Sf10FolderGrid';
 import VaultNotes from './VaultNotes';
+import LoadingState from '../ui/LoadingState';
 import styles from './Sf10Vault.module.css';
 
 const GRADE_FILTERS = ['all', '7', '8', '9', '10', '11', '12'];
 
-export default function Sf10Vault() {
+export default function Sf10Vault({ sections = [], pageLoading = false }) {
   const [activeGrade, setActiveGrade] = useState('all');
+  const [showNotesPanel, setShowNotesPanel] = useState(false);
   const [isNotesOpen, setIsNotesOpen] = useState(false);
 
   const handleImportFile = (file) => {
     console.log("Processing:", file.name);
+  };
+
+  const handleOpenNotes = () => {
+    setShowNotesPanel(true);
+    setIsNotesOpen(true);
+  };
+
+  const handleCloseNotes = () => {
+    setIsNotesOpen(false);
+    setTimeout(() => {
+      setShowNotesPanel(false);
+    }, 300);
   };
 
   return (
@@ -30,7 +44,7 @@ export default function Sf10Vault() {
         />
         <button 
           className={styles.todoBtn} 
-          onClick={() => setIsNotesOpen(true)}
+          onClick={handleOpenNotes}
         >
           <IoListOutline size={22} />
         </button>
@@ -38,7 +52,14 @@ export default function Sf10Vault() {
 
       <div className={styles.bodyRow}>
         <div className={styles.contentArea}>
-          <Sf10FolderGrid activeGrade={activeGrade} />
+          {pageLoading ? (
+            <LoadingState size="md" label="Loading SF10 storage" />
+          ) : (
+            <Sf10FolderGrid
+              activeGrade={activeGrade}
+              sections={sections}
+            />
+          )}
         </div>
 
         <div className={styles.sidePanel}>
@@ -47,10 +68,12 @@ export default function Sf10Vault() {
         </div>
       </div>
 
-      <VaultNotes 
-        isOpen={isNotesOpen} 
-        onClose={() => setIsNotesOpen(false)} 
-      />
+      {showNotesPanel ? (
+        <VaultNotes
+          isOpen={isNotesOpen}
+          onClose={handleCloseNotes}
+        />
+      ) : null}
     </section>
   );
 }

@@ -3,39 +3,75 @@
 import { IoDocumentTextOutline, IoFolderOutline } from 'react-icons/io5';
 import styles from './Sf10FolderGrid.module.css';
 
-const MOCK_FOLDERS = [
-  { id: 1,  grade: '7',  section: 'Apollo',      count: 32, updated: '2 days ago' },
-  { id: 2,  grade: '7',  section: 'Artemis',     count: 28, updated: '1 week ago' },
-  { id: 3,  grade: '8',  section: 'Pythagoras',  count: 35, updated: '3 days ago' },
-  { id: 4,  grade: '8',  section: 'Euclid',      count: 30, updated: '5 days ago' },
-  { id: 5,  grade: '9',  section: 'Newton',      count: 27, updated: '1 day ago'  },
-  { id: 6,  grade: '9',  section: 'Darwin',      count: 31, updated: '4 days ago' },
-  { id: 7,  grade: '10', section: 'Einstein',    count: 29, updated: '2 weeks ago'},
-  { id: 8,  grade: '10', section: 'Curie',       count: 33, updated: '1 day ago'  },
-  { id: 9,  grade: '11', section: 'Tesla',       count: 25, updated: '3 days ago' },
-  { id: 10, grade: '11', section: 'Edison',      count: 22, updated: '1 week ago' },
-  { id: 11, grade: '12', section: 'Hawking',     count: 18, updated: '2 days ago' },
-  { id: 12, grade: '12', section: 'Bohr',        count: 20, updated: '3 weeks ago'},
-];
+function getRelativeDate(dateValue) {
+  if (!dateValue) return 'No updates';
 
-export default function Sf10FolderGrid({ activeGrade }) {
-  const folders =
+  const inputDate = new Date(dateValue);
+  if (Number.isNaN(inputDate.getTime())) return 'No updates';
+
+  const diffMs = Date.now() - inputDate.getTime();
+  const minute = 60 * 1000;
+  const hour = 60 * minute;
+  const day = 24 * hour;
+  const week = 7 * day;
+
+  if (diffMs < hour) {
+    const mins = Math.max(1, Math.floor(diffMs / minute));
+    return `${mins} min${mins > 1 ? 's' : ''} ago`;
+  }
+
+  if (diffMs < day) {
+    const hours = Math.floor(diffMs / hour);
+    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  }
+
+  if (diffMs < week) {
+    const days = Math.floor(diffMs / day);
+    return `${days} day${days > 1 ? 's' : ''} ago`;
+  }
+
+  const weeks = Math.floor(diffMs / week);
+  return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+}
+
+export default function Sf10FolderGrid({ activeGrade, pageLoading = false, sections = [] }) {
+  const folders = (sections || []).map((section) => ({
+    id: section.id,
+    grade: String(section.grade_level ?? ''),
+    sectionName: section.section_name || section.name || 'Unnamed Section',
+    updated: getRelativeDate(section.updated_at || section.created_at),
+  }));
+
+  const filteredFolders =
     activeGrade === 'all'
-      ? MOCK_FOLDERS
-      : MOCK_FOLDERS.filter((f) => f.grade === activeGrade);
+      ? folders
+      : folders.filter((folder) => folder.grade === activeGrade);
 
-  if (folders.length === 0) {
+  if (pageLoading) {
     return (
       <div className={styles.emptyState}>
         <IoFolderOutline size={42} />
-        <p>No folders found for Grade {activeGrade}</p>
+        <p>Loading sections...</p>
+      </div>
+    );
+  }
+
+  if (filteredFolders.length === 0) {
+    return (
+      <div className={styles.emptyState}>
+        <IoFolderOutline size={42} />
+        <p>
+          {activeGrade === 'all'
+            ? 'No section folders found.'
+            : `No folders found for Grade ${activeGrade}`}
+        </p>
       </div>
     );
   }
 
   return (
     <div className={styles.grid}>
-      {folders.map((folder) => (
+      {filteredFolders.map((folder) => (
         <div key={folder.id} className={styles.folderTile}>
           <div className={styles.fileWrapper}>
             <div className={styles.folderBack} />
@@ -45,11 +81,11 @@ export default function Sf10FolderGrid({ activeGrade }) {
             <div className={styles.folderFront}>
               <div className={styles.tileLabel}>
                 <span className={styles.folderName}>
-                  Grade {folder.grade} &ndash; {folder.section}
+                  Grade {folder.grade} &ndash; {folder.sectionName}
                 </span>
                 <div className={styles.folderMeta}>
                   <IoDocumentTextOutline size={11} />
-                  <span>{folder.count} files</span>
+                  <span>{folder.updated}</span>
                 </div>
               </div>
             </div>

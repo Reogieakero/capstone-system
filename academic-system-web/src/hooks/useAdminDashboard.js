@@ -134,6 +134,10 @@ export default function useAdminDashboard() {
       fetchUsers();
       fetchSections();
     }
+
+    if (activePage === 'storage') {
+      fetchSections();
+    }
   }, [activePage, fetchSections, fetchStats, fetchUsers, loading]);
 
   useEffect(() => {

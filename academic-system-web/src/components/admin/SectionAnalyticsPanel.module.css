@@ -1,0 +1,206 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.statCard, .graphCard {
+  background: #f9fbf9; 
+  border: 1px solid rgba(46, 125, 50, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.statCard {
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Updated Layout Grid */
+.mainDashboardGrid {
+  display: grid;
+  grid-template-columns: 420px 1fr; /* 2 columns */
+  gap: 20px;
+}
+
+.leftPanel {
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.rightPanel {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Spans across both columns at the bottom */
+.bottomPanel {
+  grid-column: 1 / span 2; 
+  padding: 24px;
+}
+
+.graphCard {
+  padding: 24px;
+  position: relative;
+}
+
+.graphHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  color: var(--color-brand-green-strong);
+}
+
+.graphHeader h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-strong);
+  text-transform: uppercase;
+}
+
+.pieContainer {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pieCenterLabel {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.bigLabel {
+  display: block;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--color-text-strong);
+}
+
+.smallLabel {
+  font-size: 0.7rem;
+  color: var(--color-text-subtle);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.iconCircle {
+  background: var(--color-brand-green-soft);
+  color: var(--color-brand-green-strong);
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.statValue {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.bottomHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.filterWrapper {
+  /* This ensures your FilterTabs don't look too bulky inside the card */
+  transform: scale(0.9);
+  transform-origin: right;
+}
+
+.bottomPanel {
+  grid-column: 1 / span 2;
+  padding: 24px;
+}
+
+/* Ensure the BarChart has room for the labels */
+.bottomPanel h3 {
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* ── Chart Tooltip ── */
+.customTooltip {
+  background: #ffffff;
+  border: 1px solid rgba(46, 125, 50, 0.15);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  min-width: 140px;
+  pointer-events: none;
+}
+
+.tooltipTitle {
+  margin: 0 0 2px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tooltipDivider {
+  height: 1px;
+  background: rgba(46, 125, 50, 0.12);
+  margin: 6px 0;
+}
+
+.tooltipValue {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--color-text-subtle);
+  font-weight: 500;
+}
+
+.tooltipValue span {
+  color: var(--color-brand-green-strong);
+  font-weight: 700;
+}
+
+.tooltipSub {
+  margin: 3px 0 0;
+  font-size: 0.76rem;
+  color: var(--color-text-subtle);
+}
+
+.tooltipSub span {
+  color: var(--color-text-strong);
+  font-weight: 600;
+}
+
+/* responsive adjustment */
+@media (max-width: 1024px) {
+  .bottomHeaderRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filterWrapper {
+    transform-origin: left;
+    width: 100%;
+    overflow-x: auto;
+  }
+}

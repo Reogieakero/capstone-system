@@ -91,7 +91,12 @@ export default function AdminPage() {
             />
           )}
 
-          {activePage === 'storage' && <Sf10Vault />}
+          {activePage === 'storage' && (
+            <Sf10Vault
+              pageLoading={pageLoading}
+              sections={sections}
+            />
+          )}
         </main>
       </div>
     </div>
