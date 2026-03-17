@@ -7,27 +7,47 @@ import {
 } from 'recharts';
 import { 
   IoPeopleOutline, IoStatsChartOutline, IoCalendarOutline, 
-  IoPieChartOutline, IoCheckmarkDoneOutline, IoTrendingUpOutline 
+  IoPieChartOutline, IoCheckmarkDoneOutline, IoTrendingUpOutline,
+  IoHelpCircleOutline 
 } from 'react-icons/io5';
 import FilterTabs from '../ui/FilterTabs'; 
 import styles from './SectionAnalyticsPanel.module.css';
 
-// --- MOCK DATA ---
+// --- MOCK DATA & CONSTANTS ---
 const SUBJECTS = ['Math', 'Science', 'English', 'Filipino', 'History', 'MAPEH', 'TLE', 'ICT'];
+const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4', 'Final'];
+
+const CHART_INFO = {
+  proficiency: "Displays the distribution of students based on their cumulative grade averages and competency levels.",
+  distribution: "Shows the number of students falling within specific grade ranges for the selected grading period.",
+  attendance: "Tracks the average daily attendance percentage of the section over the current week.",
+  submission: "Monitors the percentage of students who successfully turned in specific assignments and activities."
+};
+
+// Logic to generate different grade data based on quarter
+const getGradeData = (period) => {
+  const variations = {
+    'Q1': [8, 15, 12, 5, 2],
+    'Q2': [10, 12, 14, 4, 2],
+    'Q3': [12, 10, 15, 3, 2],
+    'Q4': [15, 14, 8, 3, 2],
+    'Final': [14, 16, 9, 2, 1],
+  };
+  const counts = variations[period] || variations['Q1'];
+  return [
+    { range: '95-100', count: counts[0] },
+    { range: '90-94', count: counts[1] },
+    { range: '85-89', count: counts[2] },
+    { range: '80-84', count: counts[3] },
+    { range: '75-79', count: counts[4] },
+  ];
+};
 
 const proficiencyData = [
   { name: 'Advanced', value: 12, color: '#1b5e20', desc: 'Average 95-100' },
   { name: 'Proficient', value: 18, color: '#2e7d32', desc: 'Average 90-94' },
   { name: 'Approaching', value: 8, color: '#66bb6a', desc: 'Average 85-89' },
   { name: 'Developing', value: 4, color: '#a5d6a7', desc: 'Average Below 85' },
-];
-
-const gradeData = [
-  { range: '95-100', count: 8 },
-  { range: '90-94', count: 15 },
-  { range: '85-89', count: 12 },
-  { range: '80-84', count: 5 },
-  { range: '75-79', count: 2 },
 ];
 
 const attendanceData = [
@@ -43,7 +63,8 @@ const getSubmissionData = (subject) => [
   { task: 'Final Proj', rate: 88, date: 'Mar 17' },
 ];
 
-// FIXED: Define the component OUTSIDE of the main render function
+// --- EXTERNAL COMPONENTS (FIXED) ---
+
 const CustomTooltip = ({ active, payload, label, type }) => {
   if (active && payload && payload.length) {
     return (
@@ -56,25 +77,39 @@ const CustomTooltip = ({ active, payload, label, type }) => {
            type === 'pie' ? 'Total: ' : 'Rate: '}
           <span>{payload[0].value}{type === 'grade' || type === 'pie' ? '' : '%'}</span>
         </p>
-        {payload[0].payload.date && (
-          <p className={styles.tooltipSub}>Date: <span>{payload[0].payload.date}</span></p>
-        )}
-        {payload[0].payload.desc && (
-          <p className={styles.tooltipSub}>Criteria: <span>{payload[0].payload.desc}</span></p>
-        )}
+        {payload[0].payload.date && <p className={styles.tooltipSub}>Date: <span>{payload[0].payload.date}</span></p>}
+        {payload[0].payload.desc && <p className={styles.tooltipSub}>Criteria: <span>{payload[0].payload.desc}</span></p>}
       </div>
     );
   }
   return null;
 };
 
+const ChartHeader = ({ icon: Icon, title, info, subtitle, children }) => (
+  <div className={styles.graphHeader}>
+    <div className={styles.headerTitleGroup}>
+      <Icon />
+      <div className={styles.titleStack}>
+        <h3>{title}</h3>
+        {subtitle && <span className={styles.subtitle}>{subtitle}</span>}
+      </div>
+      <div className={styles.infoWrapper}>
+        <IoHelpCircleOutline className={styles.infoIcon} />
+        <div className={styles.infoTooltip}>{info}</div>
+      </div>
+    </div>
+    {children && <div className={styles.headerFilterSlot}>{children}</div>}
+  </div>
+);
+
 export default function SectionAnalyticsPanel() {
   const [activeSubject, setActiveSubject] = useState('Math');
+  const [activeQuarter, setActiveQuarter] = useState('Q1');
   const brandGreen = '#2e7d32';
 
   return (
     <div className={styles.container}>
-      {/* Top Stats Cards */}
+      {/* Top Stats */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
           <div className={styles.iconCircle}><IoPeopleOutline size={20} /></div>
@@ -93,17 +128,13 @@ export default function SectionAnalyticsPanel() {
       <div className={styles.mainDashboardGrid}>
         {/* LEFT: Pie Chart */}
         <div className={`${styles.graphCard} ${styles.leftPanel}`}>
-          <div className={styles.graphHeader}>
-            <IoPieChartOutline />
-            <h3>Section Proficiency</h3>
-          </div>
+          <ChartHeader icon={IoPieChartOutline} title="Section Proficiency" info={CHART_INFO.proficiency} />
           <div className={styles.pieContainer}>
             <ResponsiveContainer width="100%" height={380}>
               <PieChart>
                 <Pie data={proficiencyData} innerRadius={85} outerRadius={125} paddingAngle={8} dataKey="value">
                   {proficiencyData.map((entry, index) => <Cell key={index} fill={entry.color} stroke="none" />)}
                 </Pie>
-                {/* Use content prop to pass our component */}
                 <Tooltip content={<CustomTooltip type="pie" />} />
                 <Legend verticalAlign="bottom" align="center" iconType="circle" />
               </PieChart>
@@ -115,12 +146,24 @@ export default function SectionAnalyticsPanel() {
           </div>
         </div>
 
-        {/* RIGHT: Grade & Attendance Stack */}
+        {/* RIGHT: Grade & Attendance */}
         <div className={styles.rightPanel}>
           <div className={styles.graphCard}>
-            <div className={styles.graphHeader}><IoStatsChartOutline /><h3>Grade Distribution</h3></div>
+            <ChartHeader 
+              icon={IoStatsChartOutline} 
+              title="Grades" 
+              info={CHART_INFO.distribution}
+            >
+              <div className={styles.miniFilter}>
+                <FilterTabs 
+                  items={QUARTERS} 
+                  activeValue={activeQuarter} 
+                  onChange={setActiveQuarter} 
+                />
+              </div>
+            </ChartHeader>
             <ResponsiveContainer width="100%" height={150}>
-              <BarChart data={gradeData}>
+              <BarChart data={getGradeData(activeQuarter)}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
                 <XAxis dataKey="range" fontSize={11} tickLine={false} axisLine={false} />
                 <YAxis fontSize={11} tickLine={false} axisLine={false} />
@@ -131,7 +174,7 @@ export default function SectionAnalyticsPanel() {
           </div>
 
           <div className={styles.graphCard}>
-            <div className={styles.graphHeader}><IoTrendingUpOutline /><h3>Weekly Attendance</h3></div>
+            <ChartHeader icon={IoTrendingUpOutline} title="Weekly Attendance" info={CHART_INFO.attendance} />
             <ResponsiveContainer width="100%" height={150}>
               <LineChart data={attendanceData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
@@ -144,16 +187,15 @@ export default function SectionAnalyticsPanel() {
           </div>
         </div>
 
-        {/* BOTTOM: Submission with Filter and Dates */}
+        {/* BOTTOM: Submission */}
         <div className={`${styles.graphCard} ${styles.bottomPanel}`}>
           <div className={styles.bottomHeaderRow}>
-            <div className={styles.graphHeader}>
-              <IoCheckmarkDoneOutline />
-              <div className={styles.titleStack}>
-                <h3>Submission Rates</h3>
-                <span className={styles.subtitle}>{activeSubject} Overview</span>
-              </div>
-            </div>
+            <ChartHeader 
+              icon={IoCheckmarkDoneOutline} 
+              title="Submission Rates" 
+              subtitle={`${activeSubject} Overview`}
+              info={CHART_INFO.submission} 
+            />
             <div className={styles.filterWrapper}>
               <FilterTabs items={SUBJECTS} activeValue={activeSubject} onChange={setActiveSubject} />
             </div>

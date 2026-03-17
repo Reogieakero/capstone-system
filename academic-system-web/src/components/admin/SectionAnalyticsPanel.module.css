@@ -25,10 +25,9 @@
   gap: 16px;
 }
 
-/* Updated Layout Grid */
 .mainDashboardGrid {
   display: grid;
-  grid-template-columns: 420px 1fr; /* 2 columns */
+  grid-template-columns: 420px 1fr;
   gap: 20px;
 }
 
@@ -46,7 +45,6 @@
   gap: 20px;
 }
 
-/* Spans across both columns at the bottom */
 .bottomPanel {
   grid-column: 1 / span 2; 
   padding: 24px;
@@ -126,7 +124,6 @@
 }
 
 .filterWrapper {
-  /* This ensures your FilterTabs don't look too bulky inside the card */
   transform: scale(0.9);
   transform-origin: right;
 }
@@ -136,13 +133,11 @@
   padding: 24px;
 }
 
-/* Ensure the BarChart has room for the labels */
 .bottomPanel h3 {
   margin: 0;
   white-space: nowrap;
 }
 
-/* ── Chart Tooltip ── */
 .customTooltip {
   background: #ffffff;
   border: 1px solid rgba(46, 125, 50, 0.15);
@@ -191,7 +186,6 @@
   font-weight: 600;
 }
 
-/* responsive adjustment */
 @media (max-width: 1024px) {
   .bottomHeaderRow {
     flex-direction: column;
@@ -202,5 +196,109 @@
     transform-origin: left;
     width: 100%;
     overflow-x: auto;
+  }
+}
+
+.graphHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  color: var(--color-brand-green-strong);
+}
+
+.headerTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.infoWrapper {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+
+.infoIcon {
+  font-size: 1.2rem;
+  color: var(--color-text-subtle);
+  transition: color 0.2s ease;
+}
+
+.infoIcon:hover {
+  color: var(--color-brand-green-strong);
+}
+
+.infoTooltip {
+  visibility: hidden;
+  width: 220px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 8px;
+  padding: 10px;
+  position: absolute;
+  z-index: 10;
+  bottom: 125%;
+  right: 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-weight: 400;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  pointer-events: none;
+}
+
+.infoTooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.infoWrapper:hover .infoTooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.miniFilter {
+  /* no extra margin needed — sits in headerFilterSlot */
+  transform: scale(0.85);
+  transform-origin: right center;
+}
+
+.headerFilterSlot {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.headerTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1; /* Allows title group to push the info icon to the right */
+}
+
+.graphCard {
+  padding: 20px 24px;
+}
+
+.graphHeader h3 {
+  white-space: nowrap;
+}
+
+@media (max-width: 1200px) {
+  .headerTitleGroup {
+    flex-wrap: wrap;
+  }
+  .miniFilter {
+    margin-left: 0;
+    margin-top: 5px;
+    width: 100%;
   }
 }
