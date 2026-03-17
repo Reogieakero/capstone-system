@@ -10,12 +10,18 @@ export default function VaultNotes({ isOpen, onClose }) {
     { id: 2, text: 'Verify LRNs for new transferees', date: 'Mar 16' }
   ]);
 
-  if (!isOpen) return null;
-
   return (
     <>
-      <div className={styles.overlay} onClick={onClose} />
-      <div className={styles.notepadPanel}>
+      {/* Overlay */}
+      <div 
+        className={`${styles.overlay} ${!isOpen ? styles.fadeOut : ''}`} 
+        onClick={onClose} 
+      />
+
+      {/* Notepad Panel */}
+      <div 
+        className={`${styles.notepadPanel} ${!isOpen ? styles.slideOut : styles.slideIn}`}
+      >
         <div className={styles.header}>
           <div className={styles.titleGroup}>
             <IoCreateOutline size={20} className={styles.penIcon} />

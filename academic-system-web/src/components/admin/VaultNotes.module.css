@@ -4,6 +4,11 @@
   background: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(2px);
   z-index: 1000;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.fadeOut {
+  animation: fadeOut 0.3s ease-in forwards;
 }
 
 .notepadPanel {
@@ -17,12 +22,31 @@
   z-index: 1001;
   display: flex;
   flex-direction: column;
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.slideOut {
+  animation: slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes slideIn {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
+}
+
+@keyframes slideOut {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 .header {
@@ -109,3 +133,13 @@
 
 .deleteIcon { cursor: pointer; }
 .deleteIcon:hover { color: #fa5252; }
+
+.fadeOut {
+  animation: fadeOut 0.3s ease-in forwards;
+  pointer-events: none;   /* ← ADD THIS LINE */
+}
+
+.slideOut {
+  animation: slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;   /* ← ADD THIS LINE */
+}
