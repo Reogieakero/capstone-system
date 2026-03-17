@@ -123,6 +123,10 @@ export default function SectionAnalyticsPanel() {
           <div className={styles.iconCircle}><IoCalendarOutline size={20} /></div>
           <div><h3>Attendance</h3><p className={styles.statValue}>92.6%</p></div>
         </div>
+        <div className={styles.statCard}>
+          <div className={styles.iconCircle}><IoPeopleOutline size={20} /></div>
+          <div><h3>Absentees</h3><p className={styles.statValue}>3</p></div>
+        </div>
       </div>
 
       <div className={styles.mainDashboardGrid}>

@@ -55,6 +55,14 @@
   gap: 1px;
 }
 
+.analyticsTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
 .analyticsTitle {
   margin: 0;
   font-size: 1.38rem;
@@ -75,6 +83,13 @@
 .analyticsAdviser span {
   color: var(--color-brand-green);
   font-weight: 500;
+}
+
+.analyticsRangeTabs {
+  display: flex;
+  align-items: center;
+  transform: scale(0.92);
+  transform-origin: right center;
 }
 
 .actionButtons {

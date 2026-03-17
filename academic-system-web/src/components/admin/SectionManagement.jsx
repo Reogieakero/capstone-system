@@ -7,15 +7,18 @@ import FloatingNotificationCard from '../ui/FloatingNotificationCard';
 import InsertSectionModal from './InsertSectionModal';
 import SectionBodyCards from './SectionBodyCards';
 import SectionAnalyticsPanel from './SectionAnalyticsPanel';
+import FilterTabs from '../ui/FilterTabs';
 import LoadingState from '../ui/LoadingState';
 import styles from './SectionManagement.module.css'; 
 
 export default function SectionManagement({ users = [], sections = [], onCreateSection, onRefresh, pageLoading }) {
+  const analyticsDateRanges = ['Today', 'Yesterday', 'Last Month'];
   const [showAdviserCard, setShowAdviserCard] = useState(false);
   const [showInsertModal, setShowInsertModal] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedSectionId, setSelectedSectionId] = useState(null);
   const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(false);
+  const [analyticsDateRange, setAnalyticsDateRange] = useState('Today');
 
   const handleViewAnalytics = (id) => {
     setIsAnalyticsLoading(true);
@@ -80,9 +83,18 @@ export default function SectionManagement({ users = [], sections = [], onCreateS
               <span>Back to Sections</span>
             </button>
             <div className={styles.analyticsHeaderLeft}>
-              <h1 className={styles.analyticsTitle}>
-                {sectionLabel} Performance Analytics
-              </h1>
+              <div className={styles.analyticsTitleRow}>
+                <h1 className={styles.analyticsTitle}>
+                  {sectionLabel} Performance Analytics
+                </h1>
+                <div className={styles.analyticsRangeTabs}>
+                  <FilterTabs
+                    items={analyticsDateRanges}
+                    activeValue={analyticsDateRange}
+                    onChange={setAnalyticsDateRange}
+                  />
+                </div>
+              </div>
               {selectedSection && (
                 <p className={styles.analyticsAdviser}>
                   Adviser: <span>{selectedSection.adviser_name || 'Unknown Adviser'}</span>
