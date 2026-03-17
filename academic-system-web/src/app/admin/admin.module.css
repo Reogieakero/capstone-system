@@ -55,3 +55,21 @@
   letter-spacing: -0.02em;
   font-family: var(--font-unbounded);
 }
+
+.sf10BackBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--color-text-subtle);
+  transition: color 0.15s ease;
+}
+
+.sf10BackBtn:hover {
+  color: var(--color-brand-green);
+}

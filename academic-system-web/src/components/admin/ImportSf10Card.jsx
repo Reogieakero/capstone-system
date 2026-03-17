@@ -12,12 +12,15 @@ export default function ImportSf10Card({ onImport }) {
   const handleFile = (file) => {
     if (!file) return;
     const fileName = file.name.toLowerCase();
-    const isValidType = fileName.endsWith('.pdf') || fileName.endsWith('.docx');
+    const isValidType = fileName.endsWith('.xlsx');
 
     if (isValidType) {
       if (onImport) onImport(file);
     } else {
-      showErrorToast("Invalid file type. Please upload a PDF or DOCX file.");
+      showErrorToast({
+        title: 'Invalid file type',
+        description: 'Please upload an XLSX file.',
+      });
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
@@ -44,7 +47,7 @@ export default function ImportSf10Card({ onImport }) {
 
         <div className={styles.tooltipContainer}>
             <IoHelpCircleOutline size={18} className={styles.helpIcon} />
-            <span className={styles.tooltipText}>Accepted: .PDF, .DOCX</span>
+            <span className={styles.tooltipText}>Accepted: .XLSX</span>
         </div>
       </div>
 
@@ -58,7 +61,7 @@ export default function ImportSf10Card({ onImport }) {
         ref={fileInputRef} 
         className={styles.hiddenInput} 
         onChange={(e) => handleFile(e.target.files[0])}
-        accept=".pdf, .docx"
+        accept=".xlsx"
       />
     </div>
   );

@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import { IoArrowBackOutline } from 'react-icons/io5';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import Sf10Vault from '../../components/admin/Sf10Vault';
 import AdminTopNav from '../../components/admin/AdminTopNav';
@@ -13,6 +15,8 @@ import useAdminDashboard from '../../hooks/useAdminDashboard';
 import styles from './admin.module.css';
 
 export default function AdminPage() {
+  const [sf10Folder, setSf10Folder] = useState(null);
+
   const {
     activePage,
     collapsed,
@@ -20,6 +24,9 @@ export default function AdminPage() {
     handleApprove,
     handleCreateSection,
     handleDeleteUser,
+    handleImportSf10,
+    handleGetSf10Files,
+    handleGetSf10SignedUrl,
     handleReject,
     handleSignOut,
     loading,
@@ -42,6 +49,11 @@ export default function AdminPage() {
     return <LoadingState fullScreen label="Loading admin dashboard" />;
   }
 
+  const handleNavigate = (page) => {
+    setSf10Folder(null);
+    setActivePage(page);
+  };
+
   return (
     <div className={styles.wrapper}>
       <SileoNotification />
@@ -51,14 +63,28 @@ export default function AdminPage() {
         <AdminSidebar
           activePage={activePage}
           collapsed={collapsed}
-          onNavigate={setActivePage}
+          onNavigate={handleNavigate}
           onToggle={() => setCollapsed((current) => !current)}
         />
 
         <main className={styles.main}>
           <header className={styles.header}>
+            {activePage === 'storage' && sf10Folder && (
+              <button
+                type="button"
+                className={styles.sf10BackBtn}
+                onClick={() => setSf10Folder(null)}
+              >
+                <IoArrowBackOutline size={20} />
+                <span>Back to Repository</span>
+              </button>
+            )}
             <div className={styles.headerTitleBlock}>
-              <h1 className={styles.pageTitle}>{pageTitle}</h1>
+              <h1 className={styles.pageTitle}>
+                {activePage === 'storage' && sf10Folder
+                  ? `Grade ${sf10Folder.grade} \u2013 ${sf10Folder.sectionName}`
+                  : pageTitle}
+              </h1>
             </div>
           </header>
 
@@ -93,6 +119,10 @@ export default function AdminPage() {
 
           {activePage === 'storage' && (
             <Sf10Vault
+              onImportSf10={handleImportSf10}
+              onGetFiles={handleGetSf10Files}
+              onGetSignedUrl={handleGetSf10SignedUrl}
+              onFolderSelect={setSf10Folder}
               pageLoading={pageLoading}
               sections={sections}
             />

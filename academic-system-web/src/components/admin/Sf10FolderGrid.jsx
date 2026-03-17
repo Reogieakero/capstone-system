@@ -34,7 +34,7 @@ function getRelativeDate(dateValue) {
   return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
 }
 
-export default function Sf10FolderGrid({ activeGrade, pageLoading = false, sections = [] }) {
+export default function Sf10FolderGrid({ activeGrade, pageLoading = false, sections = [], onFolderClick }) {
   const folders = (sections || []).map((section) => ({
     id: section.id,
     grade: String(section.grade_level ?? ''),
@@ -72,7 +72,14 @@ export default function Sf10FolderGrid({ activeGrade, pageLoading = false, secti
   return (
     <div className={styles.grid}>
       {filteredFolders.map((folder) => (
-        <div key={folder.id} className={styles.folderTile}>
+        <div
+          key={folder.id}
+          className={styles.folderTile}
+          onClick={() => onFolderClick?.(folder)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && onFolderClick?.(folder)}
+        >
           <div className={styles.fileWrapper}>
             <div className={styles.folderBack} />
             <div className={styles.paper1} />

@@ -247,6 +247,81 @@ export default function useAdminDashboard() {
     [fetchSections, getToken]
   );
 
+  const handleImportSf10 = useCallback(
+    async (file, options = {}) => {
+      const token = await getToken();
+      const formData = new FormData();
+      formData.append('file', file);
+      if (options.sectionId) {
+        formData.append('sectionId', options.sectionId);
+      }
+
+      const uploadData = await showPromiseToast((async () => {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/sf10/upload`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          const error = new Error(data?.error || 'Failed to upload SF10 file.');
+          error.status = res.status;
+          error.code = data?.code || null;
+          error.details = data;
+          throw error;
+        }
+
+        await fetchSections();
+        return data;
+      })(), {
+        loading: { title: options.sectionId ? 'Uploading SF10 to selected folder...' : 'Uploading SF10 file...' },
+        success: { title: 'SF10 uploaded successfully.' },
+        error: (err) => {
+          if (err?.status === 422 && err?.code === 'SF10_DETECTION_FAILED') {
+            return { title: 'Auto-detect failed. Choose a folder.' };
+          }
+
+          return { title: err?.message || 'SF10 upload failed.' };
+        },
+      });
+
+      return uploadData;
+    },
+    [fetchSections, getToken]
+  );
+
+  const handleGetSf10Files = useCallback(
+    async (sectionId) => {
+      const token = await getToken();
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/sf10/files?sectionId=${encodeURIComponent(sectionId)}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Failed to list SF10 files.');
+      return data;
+    },
+    [getToken],
+  );
+
+  const handleGetSf10SignedUrl = useCallback(
+    async (path) => {
+      const token = await getToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/sf10/signed-url`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ path, expiresIn: 120 }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Failed to generate signed URL.');
+      return data;
+    },
+    [getToken],
+  );
+
   const refreshUsersPage = useCallback(async () => {
     await fetchUsers();
   }, [fetchUsers]);
@@ -280,6 +355,9 @@ export default function useAdminDashboard() {
     handleReject,
     handleDeleteUser,
     handleCreateSection,
+    handleImportSf10,
+    handleGetSf10Files,
+    handleGetSf10SignedUrl,
     handleSignOut,
     refreshSectionsPage,
     refreshUsersPage,
