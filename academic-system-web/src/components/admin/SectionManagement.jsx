@@ -11,10 +11,18 @@ import FilterTabs from '../ui/FilterTabs';
 import LoadingState from '../ui/LoadingState';
 import styles from './SectionManagement.module.css'; 
 
-export default function SectionManagement({ users = [], sections = [], onCreateSection, onRefresh, pageLoading }) {
+export default function SectionManagement({
+  users = [],
+  sections = [],
+  onCreateSection,
+  onUpdateSection,
+  onRefresh,
+  pageLoading,
+}) {
   const analyticsDateRanges = ['Today', 'Yesterday', 'Last Month'];
   const [showAdviserCard, setShowAdviserCard] = useState(false);
   const [showInsertModal, setShowInsertModal] = useState(false);
+  const [editingSection, setEditingSection] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedSectionId, setSelectedSectionId] = useState(null);
   const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(false);
@@ -37,6 +45,33 @@ export default function SectionManagement({ users = [], sections = [], onCreateS
     } finally {
       setIsRefreshing(false);
     }
+  };
+
+  const handleAddSection = () => {
+    setEditingSection(null);
+    setShowInsertModal(true);
+  };
+
+  const handleEditSection = (section) => {
+    setEditingSection(section);
+    setShowInsertModal(true);
+  };
+
+  const handleConfirmSection = async (payload) => {
+    if (editingSection && onUpdateSection) {
+      return onUpdateSection(editingSection.id, payload);
+    }
+
+    if (onCreateSection) {
+      return onCreateSection(payload);
+    }
+
+    return null;
+  };
+
+  const handleCloseModal = () => {
+    setShowInsertModal(false);
+    setEditingSection(null);
   };
 
   const adviserData = useMemo(() => {
@@ -111,7 +146,7 @@ export default function SectionManagement({ users = [], sections = [], onCreateS
               <UserRound size={16} strokeWidth={2.3} /> <span>Adviser</span>
             </button>
             
-            <button className={styles.insertBtn} onClick={() => setShowInsertModal(true)}>
+            <button className={styles.insertBtn} onClick={handleAddSection}>
               <ChevronDown size={16} strokeWidth={2.5} /> <span>Insert</span>
             </button>
 
@@ -146,6 +181,7 @@ export default function SectionManagement({ users = [], sections = [], onCreateS
           <SectionBodyCards
             sections={sections}
             onViewAnalytics={handleViewAnalytics}
+            onEditSection={handleEditSection}
           />
         )}
       </div>
@@ -158,9 +194,13 @@ export default function SectionManagement({ users = [], sections = [], onCreateS
       />
 
       <InsertSectionModal 
+        key={`${editingSection?.id || 'create'}-${showInsertModal ? 'open' : 'closed'}`}
         isOpen={showInsertModal} 
-        onClose={() => setShowInsertModal(false)}
-        onConfirm={onCreateSection}
+        mode={editingSection ? 'edit' : 'create'}
+        initialSection={editingSection}
+        existingSections={sections}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirmSection}
         teachers={users.filter(u => u.role === 'teacher')}
       />
     </div>

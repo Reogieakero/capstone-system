@@ -544,11 +544,10 @@ function sanitizeFileName(fileName) {
   return String(fileName || 'sf10.xlsx').replace(/[^a-zA-Z0-9._-]/g, '_');
 }
 
-
 function sanitizeLearnerName(name) {
   return String(name || '')
-    .replace(/,/g, '') 
-    .replace(/\s+/g, '_') 
+    .replace(/,/g, '')
+    .replace(/\s+/g, '_')
     .trim();
 }
 
@@ -609,7 +608,7 @@ function extractLearnerInfo(rows) {
   }
 
   const middleInitial = middleName ? middleName.charAt(0).toUpperCase() : '';
-  const learnerFolder = middleInitial 
+  const learnerFolder = middleInitial
     ? `${lastName}, ${firstName} ${middleInitial}`
     : `${lastName}, ${firstName}`;
 
@@ -641,12 +640,10 @@ function detectSectionFromKnownSections(corpus, sections) {
   return bestMatch?.section || null;
 }
 
-
 function detectFromKnownCells(workbook) {
   let detectedGrade = null;
   let detectedSectionName = null;
 
-  
   const gradeCandidates = ['I22', 'J22', 'H22', 'I21', 'I23', 'K22', 'G22'];
   const sectionCandidates = ['N22', 'O22', 'M22', 'N21', 'N23', 'P22', 'L22'];
 
@@ -705,6 +702,7 @@ function detectFromKnownCells(workbook) {
 async function uploadSf10(req, res) {
   const file = req.file;
   const manualSectionId = String(req.body?.sectionId || '').trim();
+  const replace = req.body?.replace === 'true' || req.query?.replace === 'true' || req.headers['x-sf10-replace'] === 'true';
 
   logSf10Debug('request_received', {
     hasFile: Boolean(file),
@@ -712,6 +710,7 @@ async function uploadSf10(req, res) {
     mimeType: file?.mimetype || null,
     fileSize: file?.size || null,
     manualSectionId: manualSectionId || null,
+    replace,
   });
 
   if (!file) {
@@ -739,10 +738,82 @@ async function uploadSf10(req, res) {
       cellHTML: true,
     });
 
+    const rows = toSheetRows(workbook);
+    const learnerFolder = extractLearnerInfo(rows);
+
+    logSf10Debug('learner_extraction', {
+      learnerFolder,
+      reason: learnerFolder ? 'Learner info extracted successfully' : 'Could not extract learner info from SF10',
+    });
+
+    // ── Fast-path: replace=true + sectionId provided ──────────────────────
+    // Skip all detection — we already know the section from the 409 response.
+    if (replace && manualSectionId) {
+      const { data: fastSection, error: fastSectionError } = await supabaseAdmin
+        .from('sections')
+        .select('id, grade_level, section_name, name')
+        .eq('id', manualSectionId)
+        .single();
+
+      if (fastSectionError || !fastSection) {
+        logSf10Debug('fast_replace_section_not_found', { manualSectionId });
+        return res.status(404).json({ error: 'Selected section could not be found.' });
+      }
+
+      const fastGrade = String(fastSection.grade_level);
+      const fastSectionName = fastSection.section_name || fastSection.name || '';
+      const sanitizedSection = sanitizeFileName(fastSectionName);
+
+      // Use the exact stored folder name from the 409 response (learnerFolderName)
+      // so we delete/upload to the right path even if sanitization has changed.
+      const storedLearnerFolderName = String(req.body?.learnerFolderName || '').trim()
+        || (learnerFolder ? sanitizeLearnerName(learnerFolder) : null);
+
+      if (storedLearnerFolderName) {
+        const learnerStoragePath = `grade_${fastGrade}/${sanitizedSection}/${storedLearnerFolderName}`;
+        const { data: existingFiles } = await supabaseAdmin.storage
+          .from(SF10_STORAGE_BUCKET)
+          .list(learnerStoragePath);
+
+        const filesToDelete = (existingFiles || [])
+          .filter((f) => f.name && f.name !== '.emptyFolderPlaceholder')
+          .map((f) => `${learnerStoragePath}/${f.name}`);
+
+        if (filesToDelete.length > 0) {
+          await supabaseAdmin.storage.from(SF10_STORAGE_BUCKET).remove(filesToDelete);
+          logSf10Debug('fast_replace_old_files_removed', { filesToDelete });
+        }
+      }
+
+      const storagePath = storedLearnerFolderName
+        ? `grade_${fastGrade}/${sanitizedSection}/${storedLearnerFolderName}/${Date.now()}_${sanitizeFileName(file.originalname)}`
+        : `grade_${fastGrade}/${sanitizedSection}/${Date.now()}_${sanitizeFileName(file.originalname)}`;
+
+      const { error: uploadError } = await supabaseAdmin.storage
+        .from(SF10_STORAGE_BUCKET)
+        .upload(storagePath, file.buffer, {
+          contentType: file.mimetype || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          upsert: true,
+        });
+
+      if (uploadError) {
+        logSf10Debug('fast_replace_upload_failed', { storagePath, error: uploadError.message });
+        return res.status(500).json({ error: uploadError.message });
+      }
+
+      logSf10Debug('fast_replace_success', { storagePath, sectionId: fastSection.id });
+      return res.status(200).json({
+        message: 'SF10 file replaced successfully.',
+        detection: { gradeLevel: fastGrade, sectionName: fastSectionName },
+        section: fastSection,
+        storage: { bucket: SF10_STORAGE_BUCKET, path: storagePath },
+      });
+    }
+    // ── End fast-path ──────────────────────────────────────────────────────
+
     const sheetMetadata = buildSheetMetadata(workbook);
     const cellStrings = toCellStrings(workbook);
     const cellEntries = toCellEntries(workbook);
-    const rows = toSheetRows(workbook);
 
     const additionalTexts = extractAdditionalWorkbookTexts(workbook);
     const allTextCorpus = Array.from(new Set([...cellStrings, ...additionalTexts]));
@@ -808,20 +879,14 @@ async function uploadSf10(req, res) {
       : null;
 
     if (manualSectionId && !manualSection) {
-      logSf10Debug('manual_section_not_found', {
-        manualSectionId,
-      });
+      logSf10Debug('manual_section_not_found', { manualSectionId });
       return res.status(404).json({ error: 'Selected section could not be found.' });
     }
 
     if (manualSection) {
       detectedSectionName = manualSection.section_name || manualSection.name || detectedSectionName;
       detectedGrade = String(manualSection.grade_level || detectedGrade || '');
-      logSf10Debug('manual_section_override_applied', {
-        manualSectionId,
-        detectedGrade,
-        detectedSectionName,
-      });
+      logSf10Debug('manual_section_override_applied', { manualSectionId, detectedGrade, detectedSectionName });
     }
 
     const matchedByCorpus = detectSectionFromKnownSections(workbookCorpus, allSections || []);
@@ -856,7 +921,6 @@ async function uploadSf10(req, res) {
 
     if (detectedSectionName && !detectedGrade) {
       const matchedByName = findMatchingSectionByName(detectedSectionName, allSections || []);
-
       if (matchedByName?.grade_level) {
         detectedGrade = String(matchedByName.grade_level);
       }
@@ -866,11 +930,7 @@ async function uploadSf10(req, res) {
       detectedGrade,
       detectedSectionName,
       matchedByCorpus: matchedByCorpus
-        ? {
-            id: matchedByCorpus.id,
-            grade_level: matchedByCorpus.grade_level,
-            section_name: matchedByCorpus.section_name || matchedByCorpus.name || null,
-          }
+        ? { id: matchedByCorpus.id, grade_level: matchedByCorpus.grade_level, section_name: matchedByCorpus.section_name || matchedByCorpus.name || null }
         : null,
     });
 
@@ -880,11 +940,7 @@ async function uploadSf10(req, res) {
       detectedSectionName = detectedSectionName || fallback.section_name || fallback.name;
       logSf10Debug('single_section_fallback', {
         reason: 'Detection incomplete; only one section exists in database — auto-routing.',
-        fallbackSection: {
-          id: fallback.id,
-          grade_level: fallback.grade_level,
-          section_name: detectedSectionName,
-        },
+        fallbackSection: { id: fallback.id, grade_level: fallback.grade_level, section_name: detectedSectionName },
       });
     }
 
@@ -909,10 +965,7 @@ async function uploadSf10(req, res) {
       .eq('grade_level', Number(detectedGrade));
 
     if (sectionFetchError) {
-      logSf10Debug('grade_sections_fetch_failed', {
-        detectedGrade,
-        error: sectionFetchError.message,
-      });
+      logSf10Debug('grade_sections_fetch_failed', { detectedGrade, error: sectionFetchError.message });
       return res.status(500).json({ error: sectionFetchError.message });
     }
 
@@ -934,11 +987,7 @@ async function uploadSf10(req, res) {
         normalized: normalizeKey(section.section_name || section.name || ''),
       })),
       matchedSection: matchedSection
-        ? {
-            id: matchedSection.id,
-            grade_level: matchedSection.grade_level,
-            section_name: matchedSection.section_name || matchedSection.name || null,
-          }
+        ? { id: matchedSection.id, grade_level: matchedSection.grade_level, section_name: matchedSection.section_name || matchedSection.name || null }
         : null,
     });
 
@@ -953,58 +1002,72 @@ async function uploadSf10(req, res) {
       });
     }
 
-  const learnerFolder = extractLearnerInfo(rows);
-  logSf10Debug('learner_extraction', {
-    learnerFolder,
-    reason: learnerFolder ? 'Learner info extracted successfully' : 'Could not extract learner info from SF10',
-  });
+    const sanitizedSection = sanitizeFileName(matchedSection.section_name || matchedSection.name || 'section');
 
-  const sanitizedSection = sanitizeFileName(matchedSection.section_name || matchedSection.name || 'section');
+    // Duplicate check — list section root and fuzzy-match learner subfolder
+    // to avoid path mismatches caused by sanitization differences.
+    if (learnerFolder && !replace) {
+      const sectionRootPath = `grade_${detectedGrade}/${sanitizedSection}`;
+      const sanitizedLearner = sanitizeLearnerName(learnerFolder).toLowerCase();
+      const stripped = (s) => s.replace(/[_\s,]/g, '').toLowerCase();
 
-  // Duplicate check: if learner folder is known, verify no file already exists for this student
-  if (learnerFolder) {
-    const learnerStoragePath = `grade_${detectedGrade}/${sanitizedSection}/${sanitizeLearnerName(learnerFolder)}`;
-    const { data: existingFiles, error: checkError } = await supabaseAdmin.storage
-      .from(SF10_STORAGE_BUCKET)
-      .list(learnerStoragePath, { limit: 1 });
+      const { data: sectionItems } = await supabaseAdmin.storage
+        .from(SF10_STORAGE_BUCKET)
+        .list(sectionRootPath, { limit: 200 });
 
-    if (!checkError && existingFiles && existingFiles.filter((f) => f.name && f.name !== '.emptyFolderPlaceholder').length > 0) {
-      logSf10Debug('duplicate_detected', {
-        learnerFolder,
-        learnerStoragePath,
-        existingCount: existingFiles.length,
+      const matchedLearnerFolder = (sectionItems || []).find((item) => {
+        if (!item.name || item.name === '.emptyFolderPlaceholder') return false;
+        const n = item.name.toLowerCase();
+        return n === sanitizedLearner || stripped(n) === stripped(sanitizedLearner);
       });
-      return res.status(409).json({
-        error: `An SF10 file for ${learnerFolder} (Grade ${detectedGrade} – ${detectedSectionName}) already exists. Please delete the existing file before uploading a new one.`,
-        code: 'SF10_DUPLICATE_FILE',
-        learner: learnerFolder,
-        grade: detectedGrade,
-        section: detectedSectionName,
-      });
+
+      if (matchedLearnerFolder) {
+        const learnerStoragePath = `${sectionRootPath}/${matchedLearnerFolder.name}`;
+        const { data: existingFiles } = await supabaseAdmin.storage
+          .from(SF10_STORAGE_BUCKET)
+          .list(learnerStoragePath, { limit: 1 });
+
+        const hasFiles = (existingFiles || []).some(
+          (f) => f.name && f.name !== '.emptyFolderPlaceholder'
+        );
+
+        if (hasFiles) {
+          logSf10Debug('duplicate_detected', {
+            learnerFolder,
+            learnerStoragePath,
+            matchedFolderName: matchedLearnerFolder.name,
+          });
+          return res.status(409).json({
+            error: `An SF10 file for ${learnerFolder} (Grade ${detectedGrade} – ${detectedSectionName}) already exists. You may choose to replace the existing file.`,
+            code: 'SF10_DUPLICATE_FILE',
+            learner: learnerFolder,
+            grade: detectedGrade,
+            section: detectedSectionName,
+            sectionId: matchedSection.id,
+            learnerFolderName: matchedLearnerFolder.name,
+            canReplace: true,
+          });
+        }
+      }
     }
-  }
 
-  const storagePath = learnerFolder
-    ? `grade_${detectedGrade}/${sanitizedSection}/${sanitizeLearnerName(learnerFolder)}/${Date.now()}_${sanitizeFileName(file.originalname)}`
-    : `grade_${detectedGrade}/${sanitizedSection}/${Date.now()}_${sanitizeFileName(file.originalname)}`;
+    const storagePath = learnerFolder
+      ? `grade_${detectedGrade}/${sanitizedSection}/${sanitizeLearnerName(learnerFolder)}/${Date.now()}_${sanitizeFileName(file.originalname)}`
+      : `grade_${detectedGrade}/${sanitizedSection}/${Date.now()}_${sanitizeFileName(file.originalname)}`;
 
-  const { error: uploadError } = await supabaseAdmin.storage
-    .from(SF10_STORAGE_BUCKET)
-    .upload(storagePath, file.buffer, {
-      contentType: file.mimetype || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      upsert: false,
-    });
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from(SF10_STORAGE_BUCKET)
+      .upload(storagePath, file.buffer, {
+        contentType: file.mimetype || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        upsert: !!replace,
+      });
 
-  if (uploadError) {
-    logSf10Debug('storage_upload_failed', {
-      bucket: SF10_STORAGE_BUCKET,
-      storagePath,
-      error: uploadError.message,
-    });
-    return res.status(500).json({ error: uploadError.message });
-  }
+    if (uploadError) {
+      logSf10Debug('storage_upload_failed', { bucket: SF10_STORAGE_BUCKET, storagePath, error: uploadError.message });
+      return res.status(500).json({ error: uploadError.message });
+    }
 
-  logSf10Debug('upload_success', {
+    logSf10Debug('upload_success', {
       bucket: SF10_STORAGE_BUCKET,
       storagePath,
       detectedGrade,
@@ -1014,15 +1077,9 @@ async function uploadSf10(req, res) {
 
     return res.status(200).json({
       message: 'SF10 file uploaded and routed successfully.',
-      detection: {
-        gradeLevel: detectedGrade,
-        sectionName: detectedSectionName,
-      },
+      detection: { gradeLevel: detectedGrade, sectionName: detectedSectionName },
       section: matchedSection,
-      storage: {
-        bucket: SF10_STORAGE_BUCKET,
-        path: storagePath,
-      },
+      storage: { bucket: SF10_STORAGE_BUCKET, path: storagePath },
     });
   } catch (error) {
     logSf10Debug('unexpected_error', {

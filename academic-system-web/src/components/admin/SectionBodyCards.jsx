@@ -1,6 +1,6 @@
 'use client';
 
-import { Award, BookOpenText, GraduationCap, UserRound, BarChart2 } from 'lucide-react';
+import { Award, BookOpenText, GraduationCap, UserRound, BarChart2, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import styles from './SectionBodyCards.module.css';
 
@@ -40,7 +40,7 @@ function getSectionLabel(section) {
   return `Grade ${gradeLevel} - ${sectionName}`;
 }
 
-export default function SectionBodyCards({ sections = [], onViewAnalytics }) {
+export default function SectionBodyCards({ sections = [], onViewAnalytics, onEditSection }) {
   return (
     <div className={styles.grid}>
       {sections.map((section) => {
@@ -58,7 +58,16 @@ export default function SectionBodyCards({ sections = [], onViewAnalytics }) {
                 <BookOpenText size={16} className={styles.headerIcon} />
                 <h3 className={styles.cardTitle}>{getSectionLabel(section)}</h3>
               </div>
-              <span className={styles.badge}>Section</span>
+              {onEditSection && (
+                <button
+                  type="button"
+                  className={styles.editIconBtn}
+                  onClick={() => onEditSection(section)}
+                  aria-label="Edit Section"
+                >
+                  <Pencil size={18} />
+                </button>
+              )}
             </div>
 
             <div className={styles.metaRow}>
@@ -71,6 +80,7 @@ export default function SectionBodyCards({ sections = [], onViewAnalytics }) {
                 <span>{section?.adviser_name || 'No Adviser Assigned'}</span>
               </div>
             </div>
+
 
             <div className={styles.studentBlock}>
               <div className={styles.studentHeader}>

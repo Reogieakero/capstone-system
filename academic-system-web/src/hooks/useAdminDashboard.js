@@ -4,11 +4,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../utils/supabaseClient';
 import { ADMIN_PAGE_TITLES } from '../../constants/admin.constants';
-import { 
-  showPromiseToast, 
-  showSuccessToast, 
-  showErrorToast 
-} from '../utils/sileoNotify'; //
+import {
+  showPromiseToast,
+  showSuccessToast,
+  showErrorToast,
+  showWarningToast,
+} from '../utils/sileoNotify';
 
 const ADMIN_ACTIVE_PAGE_KEY = 'admin_active_page';
 
@@ -35,10 +36,47 @@ export default function useAdminDashboard() {
   const [pageLoading, setPageLoading] = useState(false);
   const [userFilter, setUserFilter] = useState('all');
 
+  // Ref so the error callback inside showPromiseToast can always access
+  // the latest setter without needing it in the dependency array
+
   const getToken = useCallback(async () => {
     const { data } = await supabase.auth.getSession();
     return data.session?.access_token;
   }, []);
+
+  // ── data fetchers ─────────────────────────────────────────────────────────
+
+  const fetchSections = useCallback(async () => {
+    setPageLoading(true);
+    try {
+      const token = await getToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/sections`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSections(data.sections || data || []);
+      }
+    } finally {
+      setPageLoading(false);
+    }
+  }, [getToken]);
+
+  const fetchUsers = useCallback(async () => {
+    setPageLoading(true);
+    try {
+      const token = await getToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUsers(data.users || data || []);
+      }
+    } finally {
+      setPageLoading(false);
+    }
+  }, [getToken]);
 
   const fetchStats = useCallback(async () => {
     setPageLoading(true);
@@ -56,37 +94,7 @@ export default function useAdminDashboard() {
     }
   }, [getToken]);
 
-  const fetchUsers = useCallback(async () => {
-    setPageLoading(true);
-    try {
-      const token = await getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setUsers(data.users || []);
-      }
-    } finally {
-      setPageLoading(false);
-    }
-  }, [getToken]);
-
-  const fetchSections = useCallback(async () => {
-    setPageLoading(true);
-    try {
-      const token = await getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/sections`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setSections(data.sections || []);
-      }
-    } finally {
-      setPageLoading(false);
-    }
-  }, [getToken]);
+  // ── effects ───────────────────────────────────────────────────────────────
 
   useEffect(() => {
     async function init() {
@@ -118,26 +126,15 @@ export default function useAdminDashboard() {
   }, [router]);
 
   useEffect(() => {
-    if (loading) {
-      return;
-    }
+    if (loading) return;
 
-    if (activePage === 'overview') {
-      fetchStats();
-    }
-
-    if (activePage === 'users') {
-      fetchUsers();
-    }
-
+    if (activePage === 'overview') fetchStats();
+    if (activePage === 'users') fetchUsers();
     if (activePage === 'sections') {
       fetchUsers();
       fetchSections();
     }
-
-    if (activePage === 'storage') {
-      fetchSections();
-    }
+    if (activePage === 'storage') fetchSections();
   }, [activePage, fetchSections, fetchStats, fetchUsers, loading]);
 
   useEffect(() => {
@@ -145,59 +142,61 @@ export default function useAdminDashboard() {
     window.sessionStorage.setItem(ADMIN_ACTIVE_PAGE_KEY, activePage);
   }, [activePage]);
 
+  // ── handlers ──────────────────────────────────────────────────────────────
+
   const handleApprove = useCallback(
     async (userId, userName) => {
       try {
-      const token = await getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/approve-user`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ userId, action: 'approve' }),
-      });
+        const token = await getToken();
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/approve-user`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ userId, action: 'approve' }),
+        });
 
-      if (!res.ok) throw new Error('Failed to approve user');
+        if (!res.ok) throw new Error('Failed to approve user');
 
-      showSuccessToast({
-        title: 'User Approved',
-        description: `${userName} now has access to the system.`,
-      });
+        showSuccessToast({
+          title: 'User Approved',
+          description: `${userName} now has access to the system.`,
+        });
 
-      await Promise.all([fetchUsers(), fetchStats()]);
-    } catch (error) {
-      showErrorToast({
-        title: 'Approval Error',
-        description: error.message,
-      });
-    }
-  },
+        await Promise.all([fetchUsers(), fetchStats()]);
+      } catch (error) {
+        showErrorToast({
+          title: 'Approval Error',
+          description: error.message,
+        });
+      }
+    },
     [fetchStats, fetchUsers, getToken]
   );
 
   const handleReject = useCallback(
     async (userId, userName) => {
       try {
-      const token = await getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/approve-user`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ userId, action: 'reject' }),
-      });
+        const token = await getToken();
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/approve-user`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ userId, action: 'reject' }),
+        });
 
-      if (!res.ok) throw new Error('Failed to reject user');
+        if (!res.ok) throw new Error('Failed to reject user');
 
-      showWarningToast({
-        title: 'User Rejected',
-        description: `${userName}'s application has been moved to the rejected list.`,
-      });
+        showWarningToast({
+          title: 'User Rejected',
+          description: `${userName}'s application has been moved to the rejected list.`,
+        });
 
-      await Promise.all([fetchUsers(), fetchStats()]);
-    } catch (error) {
-      showErrorToast({
-        title: 'Rejection Error',
-        description: error.message,
-      });
-    }
-  },
+        await Promise.all([fetchUsers(), fetchStats()]);
+      } catch (error) {
+        showErrorToast({
+          title: 'Rejection Error',
+          description: error.message,
+        });
+      }
+    },
     [fetchStats, fetchUsers, getToken]
   );
 
@@ -227,47 +226,19 @@ export default function useAdminDashboard() {
   const handleCreateSection = useCallback(
     async (sectionPayload) => {
       const token = await getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/sections`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(sectionPayload),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.error || 'Failed to create section.');
-      }
-
-      await fetchSections();
-      return data;
-    },
-    [fetchSections, getToken]
-  );
-
-  const handleImportSf10 = useCallback(
-    async (file, options = {}) => {
-      const token = await getToken();
-      const formData = new FormData();
-      formData.append('file', file);
-      if (options.sectionId) {
-        formData.append('sectionId', options.sectionId);
-      }
-
-      const uploadData = await showPromiseToast((async () => {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/sf10/upload`, {
+      const created = await showPromiseToast((async () => {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/sections`, {
           method: 'POST',
           headers: {
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: formData,
+          body: JSON.stringify(sectionPayload),
         });
 
         const data = await res.json();
         if (!res.ok) {
-          const error = new Error(data?.error || 'Failed to upload SF10 file.');
+          const error = new Error(data?.error || 'Failed to create section.');
           error.status = res.status;
           error.code = data?.code || null;
           error.details = data;
@@ -277,25 +248,121 @@ export default function useAdminDashboard() {
         await fetchSections();
         return data;
       })(), {
-        loading: { title: options.sectionId ? 'Uploading SF10 to selected folder...' : 'Uploading SF10 file...' },
-        success: { title: 'SF10 uploaded successfully.' },
+        loading: { title: 'Creating section...' },
+        success: { title: 'Section created successfully.' },
         error: (err) => {
-          if (err?.status === 422 && err?.code === 'SF10_DETECTION_FAILED') {
-            return { title: 'Auto-detect failed. Choose a folder.' };
-          }
-
-          if (err?.status === 409 && err?.code === 'SF10_DUPLICATE_FILE') {
+          if (err?.status === 409 && err?.code === 'DUPLICATE_GRADE_SECTION') {
             return {
-              title: 'File already exists',
-              description: err?.message || 'An SF10 file for this student already exists in this section.',
+              title: 'Duplicate section found',
+              description: 'This grade and section name already exists.',
             };
           }
-
-          return { title: err?.message || 'SF10 upload failed.' };
+          if (err?.status === 409 && err?.code === 'ADVISER_ALREADY_ASSIGNED') {
+            const section = err?.details?.section;
+            const sectionLabel = section
+              ? `Grade ${section.grade_level} - ${section.section_name}`
+              : 'another section';
+            return {
+              title: 'Adviser already assigned',
+              description: `The selected teacher is currently assigned to ${sectionLabel}. Enable adviser replacement to proceed.`,
+            };
+          }
+          return { title: err?.message || 'Failed to create section.' };
         },
       });
 
-      return uploadData;
+      return created;
+    },
+    [fetchSections, getToken]
+  );
+
+  const handleUpdateSection = useCallback(
+    async (sectionId, sectionPayload) => {
+      const token = await getToken();
+
+      const updated = await showPromiseToast((async () => {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/sections/${encodeURIComponent(sectionId)}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(sectionPayload),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          const error = new Error(data?.error || 'Failed to update section.');
+          error.status = res.status;
+          error.code = data?.code || null;
+          error.details = data;
+          throw error;
+        }
+
+        await fetchSections();
+        return data;
+      })(), {
+        loading: { title: 'Updating section...' },
+        success: { title: 'Section updated successfully.' },
+        error: (err) => {
+          if (err?.status === 409 && err?.code === 'DUPLICATE_GRADE_SECTION') {
+            return {
+              title: 'Duplicate section found',
+              description: 'This grade and section name already exists.',
+            };
+          }
+          if (err?.status === 409 && err?.code === 'ADVISER_ALREADY_ASSIGNED') {
+            const section = err?.details?.section;
+            const sectionLabel = section
+              ? `Grade ${section.grade_level} - ${section.section_name}`
+              : 'another section';
+            return {
+              title: 'Adviser already assigned',
+              description: `The selected teacher is currently assigned to ${sectionLabel}. Enable adviser replacement to proceed.`,
+            };
+          }
+          return { title: err?.message || 'Failed to update section.' };
+        },
+      });
+
+      if (updated?.replacedSection) {
+        showWarningToast({
+          title: 'Advisers swapped',
+          description: `Grade ${updated.replacedSection.grade_level} - ${updated.replacedSection.section_name} received the previous adviser.`,
+        });
+      }
+
+      return updated;
+    },
+    [fetchSections, getToken]
+  );
+
+  const handleImportSf10 = useCallback(
+    async (file, options = {}) => {
+      const token = await getToken();
+      const formData = new FormData();
+      formData.append('file', file);
+      if (options.sectionId) formData.append('sectionId', options.sectionId);
+      if (options.replace) formData.append('replace', 'true');
+      if (options.learnerFolderName) formData.append('learnerFolderName', options.learnerFolderName);
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/sf10/upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        const error = new Error(data?.error || 'Failed to upload SF10 file.');
+        error.status = res.status;
+        error.code = data?.code || null;
+        error.details = data;
+        throw error;
+      }
+
+      await fetchSections();
+      return data;
     },
     [fetchSections, getToken]
   );
@@ -362,6 +429,7 @@ export default function useAdminDashboard() {
     handleReject,
     handleDeleteUser,
     handleCreateSection,
+    handleUpdateSection,
     handleImportSf10,
     handleGetSf10Files,
     handleGetSf10SignedUrl,

@@ -112,6 +112,20 @@
   margin-bottom: 0;
 }
 
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.checkboxRow input {
+  width: 14px;
+  height: 14px;
+  accent-color: #2d5a57;
+}
+
 .confirmSection {
   background: #f8fafc;
   padding: 12px;

@@ -1,3 +1,33 @@
+.editIconBtn {
+  background: none;
+  border: none;
+  padding: 4px;
+  margin-left: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--color-brand-green-strong);
+  transition: color 0.2s;
+}
+.editIconBtn:hover {
+  color: var(--color-brand-green-dark);
+}
+.editBtn {
+  margin-top: 8px;
+  background: var(--color-brand-green-soft);
+  color: var(--color-brand-green-strong);
+  border: 1px solid var(--color-border-section);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.editBtn:hover {
+  background: var(--color-brand-green-strong);
+  color: var(--color-white);
+}
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

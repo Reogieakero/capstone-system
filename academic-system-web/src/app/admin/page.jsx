@@ -23,6 +23,7 @@ export default function AdminPage() {
     filteredUsers,
     handleApprove,
     handleCreateSection,
+    handleUpdateSection,
     handleDeleteUser,
     handleImportSf10,
     handleGetSf10Files,
@@ -111,6 +112,7 @@ export default function AdminPage() {
             <SectionManagement
               pageLoading={pageLoading}
               onCreateSection={handleCreateSection}
+              onUpdateSection={handleUpdateSection}
               onRefresh={refreshSectionsPage}
               sections={sections}
               users={users}

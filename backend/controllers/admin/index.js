@@ -5,6 +5,7 @@ module.exports = {
   approveUser: require('./approveUser'),
   getStats: require('./getStats'),
   createSection: require('./createSection'),
+  updateSection: require('./updateSection'),
   deleteUser: require('./deleteUser'),
   uploadSf10: require('./uploadSf10'),
   createSf10SignedUrl: require('./createSf10SignedUrl'),

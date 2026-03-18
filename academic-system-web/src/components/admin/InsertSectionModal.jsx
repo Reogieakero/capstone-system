@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { IoClose, IoLayersOutline, IoCopyOutline } from 'react-icons/io5';
 import { showErrorToast, showSuccessToast } from '../../utils/sileoNotify';
 import SelectField from '../ui/SelectField';
@@ -18,23 +18,59 @@ function buildDisplayName(user = {}) {
     .trim();
 }
 
-export default function InsertSectionModal({ isOpen, onClose, onConfirm, teachers = [] }) {
-  const [selectedGrade, setSelectedGrade] = useState('');
-  const [sectionName, setSectionName] = useState('');
-  const [selectedAdviserId, setSelectedAdviserId] = useState('');
-  const [confirmAdviserId, setConfirmAdviserId] = useState('');
+export default function InsertSectionModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  teachers = [],
+  mode = 'create',
+  initialSection = null,
+  existingSections = [],
+}) {
+  const [selectedGrade, setSelectedGrade] = useState(() => (
+    mode === 'edit' && initialSection ? String(initialSection.grade_level || '') : ''
+  ));
+  const [sectionName, setSectionName] = useState(() => (
+    mode === 'edit' && initialSection ? (initialSection.section_name || initialSection.name || '') : ''
+  ));
+  const [selectedAdviserId, setSelectedAdviserId] = useState(() => (
+    mode === 'edit' && initialSection ? (initialSection.adviser_id || '') : ''
+  ));
+  const [confirmAdviserId, setConfirmAdviserId] = useState(() => (
+    mode === 'edit' && initialSection ? (initialSection.adviser_id || '') : ''
+  ));
+  const [forceReplaceAdviser, setForceReplaceAdviser] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const resetForm = () => {
     setSelectedGrade('');
     setSectionName('');
     setSelectedAdviserId('');
     setConfirmAdviserId('');
+    setForceReplaceAdviser(false);
+    setIsSubmitting(false);
   };
 
   const handleClose = () => {
     resetForm();
     onClose();
   };
+
+  const duplicateSection = useMemo(() => {
+    if (!selectedGrade || !sectionName.trim()) {
+      return null;
+    }
+
+    const normalizedName = sectionName.trim().toLowerCase();
+    return existingSections.find((section) => {
+      if (mode === 'edit' && initialSection?.id === section.id) {
+        return false;
+      }
+
+      return String(section.grade_level) === String(selectedGrade)
+        && String(section.section_name || section.name || '').trim().toLowerCase() === normalizedName;
+    }) || null;
+  }, [existingSections, initialSection, mode, sectionName, selectedGrade]);
 
   if (!isOpen) return null;
 
@@ -48,8 +84,12 @@ export default function InsertSectionModal({ isOpen, onClose, onConfirm, teacher
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
 
     if (confirmAdviserId !== selectedAdviserId) {
       showErrorToast({ 
@@ -59,11 +99,21 @@ export default function InsertSectionModal({ isOpen, onClose, onConfirm, teacher
       return;
     }
 
+    if (duplicateSection) {
+      showErrorToast({
+        title: 'Duplicate section found',
+        description: `Grade ${selectedGrade} - ${sectionName.trim()} already exists.`,
+      });
+      return;
+    }
+
     const adviser = teachers.find((teacher) => teacher.id === selectedAdviserId);
     const gradeLabel = `Grade ${selectedGrade}`;
     const normalizedSectionName = sectionName.trim();
-    resetForm();
-    onConfirm({ 
+
+    setIsSubmitting(true);
+
+    const payload = {
       name: `${gradeLabel} - ${normalizedSectionName}`,
       grade_level: selectedGrade,
       section_name: normalizedSectionName,
@@ -71,6 +121,14 @@ export default function InsertSectionModal({ isOpen, onClose, onConfirm, teacher
       adviser_name: adviser
         ? buildDisplayName(adviser)
         : '',
+      forceReplaceAdviser: mode === 'edit' ? forceReplaceAdviser : false,
+    };
+
+    // Close first so toasts are visible immediately after action starts.
+    handleClose();
+
+    Promise.resolve(onConfirm?.(payload)).catch(() => {
+      // Toasts are handled by higher-level handlers.
     });
   };
 
@@ -80,12 +138,14 @@ export default function InsertSectionModal({ isOpen, onClose, onConfirm, teacher
         <header className={styles.header}>
           <div className={styles.titleIcon}>
             <IoLayersOutline size={20} />
-            <h2>Add New Section</h2>
+            <h2>{mode === 'edit' ? 'Edit Section' : 'Add New Section'}</h2>
           </div>
           <button className={styles.closeBtn} onClick={handleClose}><IoClose size={20} /></button>
         </header>
         <p className={styles.subtitle}>
-          Create a new class section by choosing a grade, entering a section name, and assigning an adviser.
+          {mode === 'edit'
+            ? 'Update section name or adviser. Grade level is locked for existing sections.'
+            : 'Create a new class section by choosing a grade, entering a section name, and assigning an adviser.'}
         </p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
@@ -102,6 +162,7 @@ export default function InsertSectionModal({ isOpen, onClose, onConfirm, teacher
                 }))}
                 placeholder="Select grade"
                 className={styles.selectInput}
+                disabled={mode === 'edit'}
                 required
               />
             </div>
@@ -138,6 +199,17 @@ export default function InsertSectionModal({ isOpen, onClose, onConfirm, teacher
             />
           </div>
 
+          {mode === 'edit' && (
+            <label className={styles.checkboxRow}>
+              <input
+                type="checkbox"
+                checked={forceReplaceAdviser}
+                onChange={(e) => setForceReplaceAdviser(e.target.checked)}
+              />
+              <span>Replace adviser from current assignment (swap advisers)</span>
+            </label>
+          )}
+
           {selectedAdviserId && (
             <div className={styles.confirmSection}>
               <div className={styles.confirmHeader}>
@@ -170,9 +242,11 @@ export default function InsertSectionModal({ isOpen, onClose, onConfirm, teacher
             <button 
               type="submit" 
               className={styles.submitBtn}
-              disabled={!selectedGrade || !sectionName.trim() || !selectedAdviserId || confirmAdviserId !== selectedAdviserId}
+              disabled={!selectedGrade || !sectionName.trim() || !selectedAdviserId || confirmAdviserId !== selectedAdviserId || isSubmitting}
             >
-              Add Section
+              {isSubmitting
+                ? (mode === 'edit' ? 'Updating...' : 'Adding...')
+                : (mode === 'edit' ? 'Save Changes' : 'Add Section')}
             </button>
           </div>
         </form>

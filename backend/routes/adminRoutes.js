@@ -8,6 +8,7 @@ const {
 	approveUser,
 	getStats,
 	createSection,
+	updateSection,
 	deleteUser,
 	uploadSf10,
 	createSf10SignedUrl,
@@ -32,6 +33,8 @@ router.get('/stats', getStats);
 router.get('/sections', getSections);
 
 router.post('/sections', createSection);
+
+router.put('/sections/:sectionId', updateSection);
 
 router.post('/delete-user', deleteUser);
 
