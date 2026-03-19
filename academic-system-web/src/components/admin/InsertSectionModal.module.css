@@ -149,17 +149,37 @@
 }
 
 .copyBtn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   background: #fff;
-  border: 1px solid #e2e8f0;
-  padding: 4px 8px;
+  border: 1px solid #dbe4ee;
+  padding: 4px 10px;
   border-radius: 6px;
   font-size: 0.7rem;
   font-weight: 600;
   color: #64748b;
   cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.copyBtn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.copyBtnSuccess {
+  background: #ecfdf5 !important;
+  border-color: #10b981 !important;
+  color: #047857 !important;
+}
+
+.copyBtnSuccess:hover {
+  background: #d1fae5 !important;
+  border-color: #10b981 !important;
+  color: #047857 !important;
 }
 
 .confirmInput {
@@ -182,7 +202,6 @@
   font-weight: 600;
 }
 
-/* Update submitBtn to show it's disabled */
 .submitBtn:disabled {
   background-color: #94a3b8;
   cursor: not-allowed;

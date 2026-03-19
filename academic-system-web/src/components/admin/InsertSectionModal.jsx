@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { IoClose, IoLayersOutline, IoCopyOutline } from 'react-icons/io5';
+import { IoClose, IoLayersOutline, IoCopyOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
 import { showErrorToast, showSuccessToast } from '../../utils/sileoNotify';
 import SelectField from '../ui/SelectField';
 import styles from './InsertSectionModal.module.css';
@@ -41,6 +41,7 @@ export default function InsertSectionModal({
   ));
   const [forceReplaceAdviser, setForceReplaceAdviser] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const resetForm = () => {
     setSelectedGrade('');
@@ -49,6 +50,7 @@ export default function InsertSectionModal({
     setConfirmAdviserId('');
     setForceReplaceAdviser(false);
     setIsSubmitting(false);
+    setCopied(false);
   };
 
   const handleClose = () => {
@@ -78,7 +80,9 @@ export default function InsertSectionModal({
     if (!selectedAdviserId) return;
     try {
       await navigator.clipboard.writeText(selectedAdviserId);
+      setCopied(true);
       showSuccessToast({ title: 'ID Copied', description: 'Adviser ID copied to clipboard.' });
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       showErrorToast({ title: 'Copy failed', description: 'Could not copy ID.' });
     }
@@ -124,11 +128,9 @@ export default function InsertSectionModal({
       forceReplaceAdviser: mode === 'edit' ? forceReplaceAdviser : false,
     };
 
-    // Close first so toasts are visible immediately after action starts.
     handleClose();
 
     Promise.resolve(onConfirm?.(payload)).catch(() => {
-      // Toasts are handled by higher-level handlers.
     });
   };
 
@@ -216,11 +218,12 @@ export default function InsertSectionModal({
                 <label>Confirm Adviser ID</label>
                 <button 
                   type="button" 
-                  className={styles.copyBtn} 
+                  className={`${styles.copyBtn} ${copied ? styles.copyBtnSuccess : ''}`}
                   onClick={handleCopyId}
                   title="Copy ID"
                 >
-                  <IoCopyOutline size={14} /> Copy ID
+                  {copied ? <IoCheckmarkCircleOutline size={14} /> : <IoCopyOutline size={14} />}
+                  <span>{copied ? 'Copied' : 'Copy ID'}</span>
                 </button>
               </div>
               <input

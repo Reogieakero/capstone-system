@@ -65,7 +65,6 @@ export default function DeleteUserConfirmModal({
         <p><strong>Name:</strong> {fullName || 'Unknown user'}</p>
         <p><strong>Email:</strong> {user.email || 'No email available'}</p>
         
-        {/* Updated User ID Section with Copy Button */}
         <div className={styles.idContainer}>
           <p><strong>User ID:</strong></p>
           <div className={styles.idWrapper}>

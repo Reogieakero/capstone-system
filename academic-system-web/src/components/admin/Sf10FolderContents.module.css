@@ -5,7 +5,7 @@
   padding: 20px 2px 4px;
 }
 
-/* ── Document tile grid (mirrors folder grid) ── */
+/* ── Document tile grid ── */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -27,14 +27,19 @@
   padding: 0;
   cursor: pointer;
   overflow: visible;
+  transition: opacity 0.2s ease;
 }
 
 .folderTile:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: default;
 }
 
-/* ── 3D file container (matches folder tile) ── */
+.folderTileActive .fileWrapper {
+  filter: drop-shadow(0 0 8px rgba(15, 110, 86, 0.45));
+}
+
+/* ── 3D file container ── */
 .fileWrapper {
   position: relative;
   width: 160px;
@@ -56,7 +61,6 @@
   transition: box-shadow 0.3s ease;
 }
 
-/* Left tab rectangle */
 .folderBack::after {
   content: '';
   position: absolute;
@@ -68,7 +72,6 @@
   border-radius: 6px 6px 0 0;
 }
 
-/* Left tab corner connector */
 .folderBack::before {
   content: '';
   position: absolute;
@@ -80,7 +83,7 @@
   clip-path: polygon(0 35%, 0% 100%, 50% 100%);
 }
 
-/* ── Paper sheets inside folder ── */
+/* ── Paper sheets ── */
 .paper1,
 .paper2,
 .paper3 {
@@ -89,7 +92,6 @@
   border-radius: 10px;
   transition: transform 0.3s ease;
   transform-origin: bottom;
-  select: none;
 }
 
 .paper1 { background: #b8c4bc; }
@@ -117,7 +119,6 @@
   padding: 12px 14px;
 }
 
-/* Right tab rectangle */
 .folderFront::after {
   content: '';
   position: absolute;
@@ -129,7 +130,6 @@
   border-radius: 6px 6px 0 0;
 }
 
-/* Right tab corner connector */
 .folderFront::before {
   content: '';
   position: absolute;
@@ -174,7 +174,7 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
-/* ── Empty / loading state ── */
+/* ── Empty / error state ── */
 .emptyState {
   display: flex;
   flex-direction: column;
@@ -187,6 +187,122 @@
   text-align: center;
 }
 
-.emptyState p {
-  margin: 0;
+.emptyState p { margin: 0; }
+
+/* ── Full-screen overlay backdrop ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeOverlay 0.2s ease;
+  backdrop-filter: blur(3px);
 }
+
+@keyframes fadeOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Overlay panel ── */
+.overlayPanel {
+  width: 100%;
+  height: 100%;
+  background: var(--color-white, #fff);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.25s ease;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Overlay header bar ── */
+.overlayHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border-section, #9FE1CB);
+  background: var(--color-brand-green-soft, #E1F5EE);
+  flex-shrink: 0;
+}
+
+.overlayTitle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-brand-green-strong, #0F6E56);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.overlayActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.overlayIconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  color: var(--color-brand-green-strong, #0F6E56);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-decoration: none;
+}
+
+.overlayIconBtn:hover {
+  background: var(--color-border-section, #9FE1CB);
+}
+
+/* ── Overlay body ── */
+.overlayBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+}
+
+.overlayIframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.overlayError {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--color-text-empty, #94a3b8);
+  font-size: 0.84rem;
+  text-align: center;
+}
+
+.overlayError p { margin: 0; }

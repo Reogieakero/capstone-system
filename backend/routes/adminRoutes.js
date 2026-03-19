@@ -15,6 +15,8 @@ const {
 	listSf10Files,
 } = require('../controllers/admin');
 
+const { convertToPdf } = require('../controllers/admin/convertToPdf');
+
 const upload = multer({
 	storage: multer.memoryStorage(),
 	limits: {
@@ -43,5 +45,7 @@ router.post('/sf10/upload', upload.single('file'), uploadSf10);
 router.post('/sf10/signed-url', createSf10SignedUrl);
 
 router.get('/sf10/files', listSf10Files);
+
+router.post('/convert-to-pdf', convertToPdf);
 
 module.exports = router;
