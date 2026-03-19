@@ -1,34 +1,51 @@
 'use client';
 
 import React from 'react';
-import { IoTimeOutline, IoDocumentTextOutline, IoSyncOutline } from 'react-icons/io5';
+import {
+  IoTimeOutline,
+  IoDocumentTextOutline,
+  IoCloudUploadOutline,
+  IoEyeOutline,
+} from 'react-icons/io5';
 import styles from './ActivityLog.module.css';
 
-const MOCK_LOGS = [
-  { id: 1, action: 'SF10 Imported', detail: 'Grade_7_Final.pdf', time: '2 mins ago', status: 'success' },
-  { id: 2, action: 'Bulk Upload', detail: '15 student records', time: '1 hour ago', status: 'success' },
-  { id: 3, action: 'System Sync', detail: 'Database updated', time: '3 hours ago', status: 'info' },
-  { id: 4, action: 'User Approved', detail: 'Teacher Maria Clara', time: '5 hours ago', status: 'success' },
-  { id: 5, action: 'SF10 Exported', detail: 'Grade_10_Batch.docx', time: 'Yesterday', status: 'info' },
-  { id: 6, action: 'Record Deleted', detail: 'ID: 88291-SF10', time: '2 days ago', status: 'error' },
-  { id: 7, action: 'Profile Updated', detail: 'Student: Juan Dela Cruz', time: '3 days ago', status: 'success' },
-];
+function getIcon(type) {
+  switch (type) {
+    case 'import': return <IoCloudUploadOutline size={16} />;
+    case 'view':   return <IoEyeOutline size={16} />;
+    default:       return <IoDocumentTextOutline size={16} />;
+  }
+}
 
-export default function ActivityLog() {
+function formatTime(timestamp) {
+  if (!timestamp) return '';
+  const diff = Date.now() - new Date(timestamp).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins} min${mins > 1 ? 's' : ''} ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} hr${hrs > 1 ? 's' : ''} ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days} day${days > 1 ? 's' : ''} ago`;
+}
+
+export default function ActivityLog({ logs = [] }) {
   return (
     <div className={styles.logContainer}>
       <div className={styles.header}>
         <div className={styles.titleGroup}>
           <h3 className={styles.title}>Activity Logs</h3>
         </div>
-        <button className={styles.viewAll}>View All</button>
       </div>
 
       <div className={styles.logList}>
-        {MOCK_LOGS.map((log) => (
+        {logs.length === 0 && (
+          <div className={styles.emptyLog}>No activity yet this session.</div>
+        )}
+        {logs.map((log) => (
           <div key={log.id} className={styles.logItem}>
             <div className={styles.iconWrapper}>
-              <IoDocumentTextOutline size={16} />
+              {getIcon(log.type)}
             </div>
             <div className={styles.logContent}>
               <div className={styles.logMain}>
@@ -37,7 +54,7 @@ export default function ActivityLog() {
               </div>
               <div className={styles.logMeta}>
                 <IoTimeOutline size={12} />
-                <span>{log.time}</span>
+                <span>{formatTime(log.timestamp)}</span>
               </div>
             </div>
             <div className={`${styles.statusDot} ${styles[log.status]}`} />

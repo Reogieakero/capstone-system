@@ -6,7 +6,7 @@ import useSf10FolderContents from '../../hooks/useSf10FolderContents';
 import LoadingState from '../ui/LoadingState';
 import styles from './Sf10FolderContents.module.css';
 
-export default function Sf10FolderContents({ folder, onBack, onGetFiles, onGetSignedUrl }) {
+export default function Sf10FolderContents({ folder, onBack, onGetFiles, onGetSignedUrl, onFileView }) {
   const [preview, setPreview] = useState(null);
   const [previewLoading, setPreviewLoading] = useState(false);
 
@@ -54,12 +54,13 @@ export default function Sf10FolderContents({ folder, onBack, onGetFiles, onGetSi
         const blob = await res.blob();
         const objectUrl = URL.createObjectURL(blob);
         setPreview({ url: objectUrl, rawUrl: signedUrl, name, isExcel: false });
+        onFileView?.(name);
       } else {
-        // PDF — fetch as blob to bypass Content-Disposition: attachment
         const response = await fetch(signedUrl);
         const blob = await response.blob();
         const objectUrl = URL.createObjectURL(blob);
         setPreview({ url: objectUrl, rawUrl: signedUrl, name, isExcel: false });
+        onFileView?.(name);
       }
     } catch {
       setPreview({ url: null, rawUrl: null, name: file.learnerName || file.name, isExcel: false });

@@ -28,6 +28,9 @@ export default function Sf10Vault({
   onGetSignedUrl,
   onFolderSelect,
   selectedFolderExternal = null,
+  activityLogs = [],
+  onFileView,
+  onFileImport,
 }) {
   const [replaceModal, setReplaceModal] = useState({
     open: false,
@@ -142,6 +145,7 @@ export default function Sf10Vault({
               onBack={closeFolder}
               onGetFiles={onGetFiles}
               onGetSignedUrl={onGetSignedUrl}
+              onFileView={onFileView}
             />
           ) : (
             <Sf10FolderGrid
@@ -155,7 +159,7 @@ export default function Sf10Vault({
         {!selectedFolder && (
           <div className={styles.sidePanel}>
             <ImportSf10Card onImport={handleImportFile} />
-            <ActivityLog />
+            <ActivityLog logs={activityLogs} />
           </div>
         )}
       </div>

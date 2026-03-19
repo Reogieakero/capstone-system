@@ -7,8 +7,7 @@ import Sf10Vault from '../../components/admin/Sf10Vault';
 import AdminTopNav from '../../components/admin/AdminTopNav';
 import SystemOverview from '../../components/admin/SystemOverview';
 import UserManagement from '../../components/admin/UserManagement';
-import SectionManagement from '../../components/admin/SectionManagement'; 
-
+import SectionManagement from '../../components/admin/SectionManagement';
 import LoadingState from '../../components/ui/LoadingState';
 import { SileoNotification } from '../../components/ui/SileoNotification';
 import useAdminDashboard from '../../hooks/useAdminDashboard';
@@ -19,12 +18,15 @@ export default function AdminPage() {
 
   const {
     activePage,
+    activityLogs,
     collapsed,
     filteredUsers,
     handleApprove,
     handleCreateSection,
     handleUpdateSection,
     handleDeleteUser,
+    handleFileView,
+    handleFileImport,
     handleImportSf10,
     handleGetSf10Files,
     handleGetSf10SignedUrl,
@@ -121,6 +123,9 @@ export default function AdminPage() {
 
           {activePage === 'storage' && (
             <Sf10Vault
+              activityLogs={activityLogs}
+              onFileView={handleFileView}
+              onFileImport={handleFileImport}
               onImportSf10={handleImportSf10}
               onGetFiles={handleGetSf10Files}
               onGetSignedUrl={handleGetSf10SignedUrl}

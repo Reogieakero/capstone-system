@@ -12,6 +12,30 @@ import {
 } from '../utils/sileoNotify';
 
 const ADMIN_ACTIVE_PAGE_KEY = 'admin_active_page';
+const ADMIN_ACTIVITY_LOGS_KEY = 'admin_activity_logs';
+
+function getActivityLogsKey(userId) {
+  return `${ADMIN_ACTIVITY_LOGS_KEY}_${userId}`;
+}
+
+function loadActivityLogs(userId) {
+  if (typeof window === 'undefined' || !userId) return [];
+  try {
+    const saved = window.localStorage.getItem(getActivityLogsKey(userId));
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveActivityLogs(userId, logs) {
+  if (typeof window === 'undefined' || !userId) return;
+  try {
+    window.localStorage.setItem(getActivityLogsKey(userId), JSON.stringify(logs));
+  } catch {
+    // ignore
+  }
+}
 
 function getInitialAdminPage() {
   if (typeof window === 'undefined') return 'overview';
@@ -35,6 +59,36 @@ export default function useAdminDashboard() {
   const [sections, setSections] = useState([]);
   const [pageLoading, setPageLoading] = useState(false);
   const [userFilter, setUserFilter] = useState('all');
+  const [activityLogs, setActivityLogs] = useState([]);
+
+  const logActivity = useCallback(({ action, detail, type = 'default', status = 'success' }, userId) => {
+    setActivityLogs((prev) => {
+      const updated = [
+        { id: Date.now(), action, detail, type, status, timestamp: new Date().toISOString() },
+        ...prev,
+      ].slice(0, 50);
+      saveActivityLogs(userId, updated);
+      return updated;
+    });
+  }, []);
+
+  const handleFileView = useCallback((fileName) => {
+    logActivity({
+      action: 'SF10 Viewed',
+      detail: fileName,
+      type: 'view',
+      status: 'info',
+    }, profile?.id);
+  }, [logActivity, profile?.id]);
+
+  const handleFileImport = useCallback((learnerName) => {
+    logActivity({
+      action: 'SF10 Imported',
+      detail: learnerName,
+      type: 'import',
+      status: 'success',
+    }, profile?.id);
+  }, [logActivity, profile?.id]);
 
   // Ref so the error callback inside showPromiseToast can always access
   // the latest setter without needing it in the dependency array
@@ -119,6 +173,7 @@ export default function useAdminDashboard() {
       }
 
       setProfile(prof);
+      setActivityLogs(loadActivityLogs(prof.id));
       setLoading(false);
     }
 
@@ -361,10 +416,24 @@ export default function useAdminDashboard() {
         throw error;
       }
 
+      // Extract the learner folder name from the storage path
+      // path format: grade_7/SectionName/LearnerName/timestamp_filename.xlsx
+      const storagePath = data?.storage?.path ?? '';
+      const pathParts = storagePath.split('/');
+      const learnerName = pathParts.length >= 3
+        ? pathParts[pathParts.length - 2]          // second-to-last segment = learner folder
+        : (data?.detection?.sectionName || file.name);
+
+      logActivity({
+        action: 'SF10 Imported',
+        detail: learnerName,
+        type: 'import',
+        status: 'success',
+      }, profile?.id);
       await fetchSections();
       return data;
     },
-    [fetchSections, getToken]
+    [fetchSections, getToken, logActivity, profile]
   );
 
   const handleGetSf10Files = useCallback(
@@ -405,9 +474,10 @@ export default function useAdminDashboard() {
   }, [fetchSections, fetchUsers]);
 
   const handleSignOut = useCallback(async () => {
+    setActivityLogs([]);
     await supabase.auth.signOut();
     router.replace('/login');
-  }, [router]);
+  }, [router, profile?.id]);
 
   const filteredUsers = users.filter((user) => (
     userFilter === 'all' ? true : user.status === userFilter
@@ -423,6 +493,7 @@ export default function useAdminDashboard() {
 
   return {
     activePage,
+    activityLogs,
     collapsed,
     filteredUsers,
     handleApprove,
@@ -433,6 +504,8 @@ export default function useAdminDashboard() {
     handleImportSf10,
     handleGetSf10Files,
     handleGetSf10SignedUrl,
+    handleFileView,
+    handleFileImport,
     handleSignOut,
     refreshSectionsPage,
     refreshUsersPage,
