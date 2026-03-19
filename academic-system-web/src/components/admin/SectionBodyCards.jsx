@@ -93,7 +93,6 @@ export default function SectionBodyCards({ sections = [], onViewAnalytics, onEdi
         return (
           <article key={section.id} className={styles.card}>
 
-            {/* Header — always visible */}
             <div className={styles.cardHeader}>
               <div className={styles.cardTitleWrap}>
                 <BookOpenText size={16} className={styles.headerIcon} />
@@ -105,7 +104,6 @@ export default function SectionBodyCards({ sections = [], onViewAnalytics, onEdi
               </span>
             </div>
 
-            {/* Meta — fades out on hover, takes no height change */}
             <div className={styles.metaRow}>
               <div className={styles.metaItem}>
                 <UserRound size={14} />
@@ -113,14 +111,8 @@ export default function SectionBodyCards({ sections = [], onViewAnalytics, onEdi
               </div>
             </div>
 
-            {/*
-              morphArea: fixed-height container using position:relative + overflow:hidden.
-              bentoGrid and studentBlock are both position:absolute inside here,
-              so they crossfade without shifting the card height.
-            */}
             <div className={styles.morphArea}>
 
-              {/* Bento cards — visible at rest */}
               <div className={styles.bentoGrid}>
                 <div className={styles.bentoCard}>
                   <div className={styles.bentoHeader}>
@@ -160,7 +152,6 @@ export default function SectionBodyCards({ sections = [], onViewAnalytics, onEdi
                 </div>
               </div>
 
-              {/* Student block — hidden at rest, fades in on hover */}
               <div className={styles.studentBlock}>
                 <div className={styles.studentHeader}>
                   <Award size={14} />
@@ -179,7 +170,6 @@ export default function SectionBodyCards({ sections = [], onViewAnalytics, onEdi
 
             </div>
 
-            {/* Footer actions — morph in on hover */}
             <div className={styles.cardFooter}>
               <div className={styles.actions}>
                 {onViewAnalytics ? (

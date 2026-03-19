@@ -15,7 +15,7 @@
   flex-direction: column;
   gap: 10px;
   /* Fixed height — no layout shift on hover */
-  height: 240px;
+  height: 260px;
   overflow: hidden;
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
@@ -362,16 +362,6 @@
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 6px;
-  opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 0.25s ease 0.1s, transform 0.25s ease 0.1s;
-  pointer-events: none;
-}
-
-.card:hover .actions {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
 }
 
 .btnAnalytics {

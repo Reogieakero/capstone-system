@@ -20,6 +20,8 @@ export default function SectionManagement({
   pageLoading,
 }) {
   const analyticsDateRanges = ['Today', 'Yesterday', 'Last Month'];
+  const gradeFilters = ['all', '7', '8', '9', '10', '11', '12'];
+  const [activeGrade, setActiveGrade] = useState('all');
   const [showAdviserCard, setShowAdviserCard] = useState(false);
   const [showInsertModal, setShowInsertModal] = useState(false);
   const [editingSection, setEditingSection] = useState(null);
@@ -96,6 +98,11 @@ export default function SectionManagement({
     return Object.values(groupedByAdviser);
   }, [sections]);
 
+  const filteredSections = useMemo(() => {
+    if (activeGrade === 'all') return sections;
+    return sections.filter((s) => String(s.grade_level) === activeGrade);
+  }, [sections, activeGrade]);
+
   const selectedSection = sections.find((section) => section.id === selectedSectionId) || null;
 
   const sectionLabel = selectedSection
@@ -138,29 +145,37 @@ export default function SectionManagement({
             </div>
           </div>
         ) : (
-          <div className={styles.actionButtons}>
-            <button 
-              className={`${styles.advisorBtn} ${showAdviserCard ? styles.active : ''}`}
-              onClick={() => setShowAdviserCard(!showAdviserCard)}
-            >
-              <UserRound size={16} strokeWidth={2.3} /> <span>Adviser</span>
-            </button>
-            
-            <button className={styles.insertBtn} onClick={handleAddSection}>
-              <ChevronDown size={16} strokeWidth={2.5} /> <span>Insert</span>
-            </button>
+          <div className={styles.headerNormalArea}>
+            <FilterTabs
+              items={gradeFilters}
+              activeValue={activeGrade}
+              onChange={setActiveGrade}
+              renderLabel={(grade) => (grade === 'all' ? 'All Grades' : `Grade ${grade}`)}
+            />
+            <div className={styles.actionButtons}>
+              <button 
+                className={`${styles.advisorBtn} ${showAdviserCard ? styles.active : ''}`}
+                onClick={() => setShowAdviserCard(!showAdviserCard)}
+              >
+                <UserRound size={16} strokeWidth={2.3} /> <span>Adviser</span>
+              </button>
+              
+              <button className={styles.insertBtn} onClick={handleAddSection}>
+                <ChevronDown size={16} strokeWidth={2.5} /> <span>Insert</span>
+              </button>
 
-            <button 
-              className={styles.refreshBtn} 
-              onClick={handleRefresh} 
-              disabled={isRefreshing || pageLoading}
-            >
-              <RefreshCw 
-                size={15} 
-                strokeWidth={2.3} 
-                className={isRefreshing ? styles.refreshIconSpinning : ''} 
-              />
-            </button>
+              <button 
+                className={styles.refreshBtn} 
+                onClick={handleRefresh} 
+                disabled={isRefreshing || pageLoading}
+              >
+                <RefreshCw 
+                  size={15} 
+                  strokeWidth={2.3} 
+                  className={isRefreshing ? styles.refreshIconSpinning : ''} 
+                />
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -175,11 +190,13 @@ export default function SectionManagement({
             section={selectedSection}
             onBack={() => setSelectedSectionId(null)}
           />
-        ) : sections.length === 0 ? (
-          <p className={styles.emptyText}>No sections created yet.</p>
+        ) : filteredSections.length === 0 ? (
+          <p className={styles.emptyText}>
+            {activeGrade === 'all' ? 'No sections created yet.' : `No Grade ${activeGrade} sections found.`}
+          </p>
         ) : (
           <SectionBodyCards
-            sections={sections}
+            sections={filteredSections}
             onViewAnalytics={handleViewAnalytics}
             onEditSection={handleEditSection}
           />
